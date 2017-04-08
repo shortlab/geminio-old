@@ -57,7 +57,7 @@ TotalDefectLoss::TotalDefectLoss(const InputParameters & parameters) :
   _mesh.errorIfDistributedMesh("TotalDefectLoss");
 
   if (_node_ptr == NULL)
-    mooseError("Node #" << getParam<unsigned int>("nodeid") << " specified in '" << name() << "' not found in the mesh!");
+    mooseError("Node #", getParam<unsigned int>("nodeid"), " specified in '", name(), "' not found in the mesh!");
 
 }
 

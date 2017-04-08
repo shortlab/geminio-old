@@ -106,7 +106,7 @@ AddGVariable::act()
     if(_bc_type == "dirichlet") bc_name = "DirichletBC";
     else if(_bc_type == "neumann") bc_name = "NeumannBC";
     else 
-        mooseError("This bc name: "<<bc_name<<" does not exist");
+        mooseError("This bc name: ", bc_name, " does not exist");
 
     std::string var_name;
     for (int cur_num = 1; cur_num <= number_v; cur_num++)

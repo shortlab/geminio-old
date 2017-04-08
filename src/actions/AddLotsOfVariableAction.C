@@ -91,7 +91,7 @@ AddLotsOfVariableAction::act()
     if(_bc_type == "dirichlet") bc_name = "DirichletBC";
     else if(_bc_type == "neumann") bc_name = "NeumannBC";
     else 
-        mooseError("This bc name: "<<bc_name<<" does not exist");
+        mooseError("This bc name: ", bc_name, " does not exist");
     for (int cur_num = 1; cur_num <= (number_v+number_i); cur_num++)
     {
       std::string var_name;
