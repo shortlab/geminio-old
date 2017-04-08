@@ -1,0 +1,71 @@
+
+# Input file for W irradiation damage
+
+variable latparam equal 3.1652
+#variable  myT equal 363
+variable  myT equal 30
+#variable  boxL equal 35
+variable  interL equal "v_boxL - 0.5"
+variable  pkaX equal "(v_boxL-4)*v_latparam"
+
+# ------------------------ INITIALIZATION ----------------------------
+#echo           both
+units 		metal
+dimension	3
+boundary	p	p	p
+atom_style	atomic
+
+# ----------------------- ATOM DEFINITION ----------------------------
+#lattice 	bcc ${latparam} orient x -1 1 0 orient y 0 0 1 orient z 1 1 0
+lattice	bcc ${latparam}
+region		whole block -${boxL} ${boxL} -${boxL} ${boxL} -${boxL} ${boxL}
+create_box	1 whole
+#lattice 	bcc ${latparam} orient x -1 1 0 orient y 0 0 1 orient z 1 1 0
+#lattice 	bcc ${latparam} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1 
+create_atoms	1 region whole             
+
+group           W    type  1
+region          Rpka  sphere  0.0 0.0 ${pkaX} 1.5 units box
+group           pka   region Rpka
+
+region          inter block -${interL} ${interL} -${interL} ${interL} INF INF
+group           interatom region inter
+group           outeratom subtract all interatom
+
+# ------------------------ FORCE FIELDS ------------------------------
+pair_style      hybrid/overlay eam/fs  zbl  0.4 0.5
+pair_coeff      * * eam/fs /home/jinmiao/projects/lammps-16Feb16/potentials/w_eam2.fs W
+pair_coeff      * * zbl 74 74
+#pair_style      eam/fs
+#pair_coeff      * * /home/jinmiao/projects/lammps-16Feb16/potentials/w_eam2.fs W
+
+neigh_modify    every 1 delay 0 check yes
+
+compute    interT interatom temp
+compute    outerT outeratom temp
+compute csym all centro/atom bcc
+compute PE   all pe/atom
+
+# ------------------------- SETTINGS ---------------------------------
+thermo 1000 
+thermo_style custom step dt time lx ly lz press pxx pyy pzz pe temp c_interT c_outerT
+variable  time_step equal 0.001
+variable  tdamp equal "v_time_step*100"
+variable  pdamp equal "v_time_step*1000"
+
+minimize   1e-15 1e-15  10000 10000
+
+#-------------------------- Equlibration -----------------------------
+
+reset_timestep	0
+timestep  ${time_step}
+#dump           dumpNPT all custom 100000 dumpNPT*.data id type x y z
+velocity       all create ${myT} 4928459 mom yes  
+fix            1 all npt temp ${myT} ${myT} ${tdamp} iso 0.0 0.0 ${pdamp} drag 1 #Relax in NPT to zero pressure at 300K
+run            20000   
+#undump         dumpNPT     
+unfix     1
+
+dump           minimized all custom 1000000 dump_minimized.data id type x y z c_csym c_PE
+minimize    1e-15 1e-15 10000 10000
+

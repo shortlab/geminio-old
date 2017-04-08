@@ -1,0 +1,14 @@
+====== W (400) into Layer 1                     =======
+        SRIM-2008.04
+=========================================
+        Replacement Collisions       
+ See SRIM Outputs\TDATA.txt for calc. details   
+=========================================
+====== TRIM Calc.=  W(400 keV) ==> Layer 1( 1200 A) ==========================
+------------------------------------------------------------------------------
+--------------------------------------------------------------------
+    Recoil/Damage Calculations made with Kinchin-Pease Estimates    
+--------------------------------------------------------------------
+
+ There are NO Replacement Collisions calculated.
+ You must execute a full TRIM cascade calculation for these.

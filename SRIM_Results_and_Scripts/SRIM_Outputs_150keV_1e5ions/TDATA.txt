@@ -1,0 +1,39 @@
+====== W (400) into Layer 1                     =======
+        SRIM-2008.04
+=======================================
+      Data  of  TRIM  Calculation      
+=======================================
+--------------------------------------------------------------------
+    Recoil/Damage Calculations made with Kinchin-Pease Estimates    
+--------------------------------------------------------------------
+Ion =  W (74)   Ion Mass= 183.9510
+Energy  = 1500000.E-04 keV
+Ion Angle to Surface = 5 degrees
+============= TARGET MATERIAL ======================================
+  Layer # 1 - Layer 1
+  Layer # 1 - Bottom Depth=     7.E+02 A
+  Layer # 1- Density = 6.338E22 atoms/cm3 = 19.35 g/cm3
+  Layer # 1-  W = 100  Atomic Percent = 50   Mass Percent
+====================================================================
+Target energies for target atom =  W
+    Displacement = 128 eV, Binding = 3.32 eV, Surface = 11.75 eV
+====================================================================
+Depth Range of Tabulated Data=  000000.E+00  -  700000.E-03  Angstroms
+====================================================================
+Total Ions calculated =  100000
+Average Range         =   14964.E-02 Angstroms
+Average Straggling    =   78890.E-03 Angstroms
+Average Vacancy/Ion   =   33708.E-02
+====================================================================
+Total Backscattered Ions=  996 
+Total Transmitted Ions  =  0 
+====================================================================
+See files SRIM Outputs\*.txt for tables :
+   TDATA.txt    -- Details of the calculation.
+   RANGE.txt    -- Final distribution of Ions/Recoils
+   VACANCY.txt  -- Distribution of Vacancies
+   IONIZ.txt    -- Distribution of Ionization
+   PHONON.txt   -- Distribution of Phonons
+   E2RECOIL.txt -- Energy transferred to recoils
+   NOVAC.txt    -- Replacement collisions
+   LATERAL.txt  -- Lateral Spread of Ions

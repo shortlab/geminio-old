@@ -1,0 +1,2 @@
+# Size Number Variance
+1 0.5000 0.0083

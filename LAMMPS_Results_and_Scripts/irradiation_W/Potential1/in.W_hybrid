@@ -1,0 +1,113 @@
+
+########### Input file for W irradiation damage
+
+variable latparam equal 3.1652
+#variable  myT equal 363
+variable  myT equal 30
+#variable  boxL equal 35
+variable  interL equal "v_boxL - 0.5"
+variable  pkaX equal "(5)*v_latparam"
+variable  pkaY equal "(-5)*v_latparam"
+variable  pkaZ equal "(-5)*v_latparam"
+#variable  pkaX equal "(v_boxL/2)*v_latparam"
+#variable  pkaY equal "(-v_boxL/2)*v_latparam"
+#variable  pkaZ equal "(-v_boxL/2)*v_latparam"
+#variable  pkaVx  equal 1024.5
+#variable  pkaVy  equal 1048.0
+#variable  pkaVz  equal 1000.0 #1774.5
+
+
+
+
+
+# ------------------------ INITIALIZATION ----------------------------
+#echo           both
+units 		metal
+dimension	3
+boundary	p	p	p
+atom_style	atomic
+
+# ----------------------- ATOM DEFINITION ----------------------------
+#lattice 	bcc ${latparam} orient x -1 1 0 orient y 0 0 1 orient z 1 1 0
+lattice	bcc ${latparam}
+region		whole block -${boxL} ${boxL} -${boxL} ${boxL} -${boxL} ${boxL}
+create_box	1 whole
+#lattice 	bcc ${latparam} orient x -1 1 0 orient y 0 0 1 orient z 1 1 0
+#lattice 	bcc ${latparam} orient x 1 0 0 orient y 0 1 0 orient z 0 0 1 
+create_atoms	1 region whole             
+
+group           W    type  1
+region          Rpka  sphere  ${pkaX} ${pkaY} ${pkaZ} 1.5 units box
+group           pka   region Rpka
+
+region          inter block -${interL} ${interL} -${interL} ${interL} INF INF
+group           interatom region inter
+group           outeratom subtract all interatom
+
+# ------------------------ FORCE FIELDS ------------------------------
+pair_style      hybrid/overlay eam/fs  zbl  1.1 1.2 
+pair_coeff      * * eam/fs /home/jinmiao/projects/lammps-16Feb16/potentials/W.eam.fs W
+pair_coeff      * * zbl 74 74
+
+neigh_modify    every 1 delay 0 check yes
+
+compute    interT interatom temp
+compute    outerT outeratom temp
+
+# ------------------------- SETTINGS ---------------------------------
+thermo 1000 
+thermo_style custom step dt time lx ly lz press pxx pyy pzz pe temp c_interT c_outerT
+variable  time_step equal 0.001
+variable  tdamp equal "v_time_step*100"
+variable  pdamp equal "v_time_step*1000"
+
+minimize   1e-15 1e-15  10000 10000
+
+#-------------------------- Equlibration -----------------------------
+
+reset_timestep	0
+timestep  ${time_step}
+#dump           dumpNPT all custom 100000 dumpNPT*.data id type x y z
+velocity       all create ${myT} 4928459 mom yes  
+fix            1 all npt temp ${myT} ${myT} ${tdamp} iso 0.0 0.0 ${pdamp} drag 1 #Relax in NPT to zero pressure at 300K
+run            20000   
+#undump         dumpNPT     
+unfix     1
+
+fix            1 all nve
+fix            2 outeratom temp/rescale 1 ${myT} ${myT} 0.8 1
+fix            3 all dt/reset 1 1.0e-6 1.0e-3 0.05 units box
+
+compute csym all centro/atom bcc
+compute PE   all pe/atom
+#dump           defect all custom 10000 dump.*.data id type x y z c_csym c_PE
+#dump_modify    defect thresh c_csym >= 4
+#dump           cascade all custom 1000 dump_cascade.data id type x y z c_csym c_PE
+#dump_modify    cascade thresh c_csym >= 5
+
+#dump   1 interatom xyz  1000  relaxed_config.xyz  
+
+#------------------------- PKA simulation ----------------------------------
+#variable    pkaE equal "0.5*(v_pkaVx*v_pkaVx+v_pkaVy*v_pkaVy+v_pkaVz*v_pkaVz)*1.9056*1e-5" #in keV
+velocity    pka   set ${pkaVx} ${pkaVy} ${pkaVz} units box
+
+compute     pkaKinetic pka ke/atom
+#dump	    1 pka custom 1000000 pkavelocity.*.txt id x y z vx vy vz c_pkaKinetic
+#dump_modify 1 first yes
+
+variable      v1 equal "step"
+variable      v2 equal "dt"
+variable      v3 equal "time"
+fix           output all print 10 "${v1} ${v2} ${v3} " file realtime.txt screen no
+
+
+run         100000
+
+#write_data     irra_quenched.data
+unfix output
+#undump 1
+#undump defect
+
+dump           minimized all custom 10000000 dump_irra_minimized.data id type x y z c_csym c_PE
+minimize    1e-15 1e-15 10000 10000
+
