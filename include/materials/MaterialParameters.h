@@ -15,16 +15,17 @@
 
 #ifndef MATERIALPARAMETERS_H
 #define MATERIALPARAMETERS_H
+
 #include <iostream>
 #include <cmath>
 #include <algorithm>
 #include <cstring>
 #include "Moose.h"
 
-double absorb(int,int,std::string,std::string,double,int,int);
-double emit(int,int,double,std::string,std::string,int,int);
-double energy(int,std::string,std::string);
-double D_prefactor(int,std::string);
-double diff(int, std::string,double);
+Real absorb(int,int,std::string,std::string,Real,int,int);
+Real emit(int,int,Real,std::string,std::string,int,int);
+Real energy(int,std::string,std::string);
+Real D_prefactor(int,std::string);
+Real diff(int, std::string,Real);
 
-#endif
+#endif // MATERIALPARAMETERS_H

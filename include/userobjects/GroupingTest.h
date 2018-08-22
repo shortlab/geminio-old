@@ -24,11 +24,6 @@ class GroupingTest : public GMaterialConstants
 public:
   GroupingTest(const InputParameters & parameters);
 
-  ~GroupingTest(){}
-  virtual void initialize();
-  virtual void execute();
-  virtual void finalize();
-
   Real absorb(int,int,std::string,std::string,Real,int,int) const;
   Real emit(int,int,Real,std::string,std::string,int,int) const;
   Real energy(int,std::string,std::string) const;

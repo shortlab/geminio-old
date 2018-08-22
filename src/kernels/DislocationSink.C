@@ -66,7 +66,7 @@ DislocationSink::computeQpResidual()
   Real K_dislocations = rho_disl * _coef *_D_species;
   //printf("dislocation sink rate: %f\n",K_dislocations);
   return _test[_i][_qp] * K_dislocations * (_u[_qp]); // Positive sign because negative source from weak form PDE
-  
+
 }
 
 Real
@@ -89,11 +89,11 @@ DislocationSink::computeQpJacobian()
   Real K_dislocations = rho_disl * _coef * _D_species;
   //printf("dislocation sink rate: %f\n",K_dislocations);
   return _test[_i][_qp] * K_dislocations * (_u[_qp]); // Positive sign because negative source from weak form PDE
-  
+
 }
 
 Real
-DislocationSink::computeQpOffDiagJacobian(unsigned int jvar)
+DislocationSink::computeQpOffDiagJacobian(unsigned int /*jvar*/)
 {
-  return 0;
+  return 0.0;
 }

@@ -24,19 +24,12 @@ class GIron : public GMaterialConstants
 public:
   GIron(const InputParameters & parameters);
 
-  ~GIron(){}
-  virtual void initialize();
-  virtual void execute();
-  virtual void finalize();
-
   Real absorb(int,int,std::string,std::string,Real,int,int) const;
   Real emit(int,int,Real,std::string,std::string,int,int) const;
   Real disl_ksq(int,std::string,Real,int=1) const;
   Real energy(int,std::string,std::string) const;
   Real D_prefactor(int,std::string) const;
   Real diff(int, std::string,Real) const;
-
-private:
 };
 
 template<>

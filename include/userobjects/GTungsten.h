@@ -24,11 +24,6 @@ class GTungsten : public GMaterialConstants
 public:
   GTungsten(const InputParameters & parameters);
 
-  ~GTungsten(){}
-  virtual void initialize();
-  virtual void execute();
-  virtual void finalize();
-
   Real absorb(int,int,std::string,std::string,Real,int,int) const;
   Real absorbVV(int,int,int,Real) const;
   Real absorbVI(int,int,int,Real) const;

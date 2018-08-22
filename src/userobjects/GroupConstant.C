@@ -58,18 +58,18 @@ GroupConstant::GroupConstant(const InputParameters & parameters) :
    // _emit_array(NULL),
    // _absorb_matrix(NULL)
 {
-    _atomic_vol = _material->atomic_vol;
-  // test input correctness
-    if(_v_size.size() > 0 && _single_v_group < *std::max_element(_v_size.begin(),_v_size.end()))
-        mooseError("max_single_group should be larger than the largest mobile size, here");
-    if( _single_v_group > _Ng_v  || _single_i_group > _Ng_i)
-        mooseError("max_single_group should be samller than total groups");
-    if( _i_size.size() > 0 && _single_i_group < *std::max_element(_i_size.begin(),_i_size.end())){
-        mooseError("max_single_group should be larger than the largest mobile size, there");
-    }
+  _atomic_vol = _material->atomic_vol;
 
-    GroupScheme_v.reserve(_Ng_v+1);
-    GroupScheme_i.reserve(_Ng_i+1);
+  // test input correctness
+  if (_v_size.size() > 0 && _single_v_group < *std::max_element(_v_size.begin(),_v_size.end()))
+    mooseError("max_single_group should be larger than the largest mobile size, here");
+  if ( _single_v_group > _Ng_v  || _single_i_group > _Ng_i)
+    mooseError("max_single_group should be samller than total groups");
+  if ( _i_size.size() > 0 && _single_i_group < *std::max_element(_i_size.begin(),_i_size.end()))
+    mooseError("max_single_group should be larger than the largest mobile size, there");
+
+  GroupScheme_v.reserve(_Ng_v+1);
+  GroupScheme_i.reserve(_Ng_i+1);
 }
 
 GroupConstant::~GroupConstant(){
@@ -119,110 +119,134 @@ GroupConstant::initialize()
 }
 
 void
-GroupConstant::setGroupScheme(){//total _Ng group, _Ng+1 node
-  if(_GroupScheme=="Uniform"){
+GroupConstant::setGroupScheme()
+{
+  //total _Ng group, _Ng+1 node
+  if (_GroupScheme == "Uniform"){
     if(_num_v < _Ng_v || _num_i < _Ng_i)
         mooseError("Size setting not correct");
-//add vacancy group scheme
-    if(_Ng_v>0){
-        int single_v_group = _single_v_group+1;//1. 2. 3. each as a group, [1 2) [2 3) [3 4)
-        int count = 0;
-        for(int i=1;i<=single_v_group;i++){
-            GroupScheme_v.push_back(i);
-            count++;
-//            printf("add %d\n",GroupScheme_v.back());
+
+    // add vacancy group scheme
+    if (_Ng_v>0)
+    {
+      // 1. 2. 3. each as a group, [1 2) [2 3) [3 4)
+      int single_v_group = _single_v_group + 1;
+      int count = 0;
+      for(int i=1;i<=single_v_group;i++){
+        GroupScheme_v.push_back(i);
+        count++;
+        // printf("add %d\n",GroupScheme_v.back());
+      }
+
+      if (_single_v_group<_Ng_v){
+        int interval = (int)(_num_v-single_v_group)/(_Ng_v-single_v_group+1);
+        for (int i=single_v_group+interval;count<=_Ng_v;){//i<=_num_v;
+          GroupScheme_v.push_back(i);
+          count++;
+          i += interval;
         }
-        if(_single_v_group<_Ng_v){
-          int interval = (int)(_num_v-single_v_group)/(_Ng_v-single_v_group+1);
-          for(int i=single_v_group+interval;count<=_Ng_v;){//i<=_num_v;
-              GroupScheme_v.push_back(i);
-              count++;
-              i += interval;
-          }
-        }
-        if(GroupScheme_v.back() != _num_v) GroupScheme_v[GroupScheme_v.size()-1] = _num_v;
-        if((int)(GroupScheme_v.size()) != _Ng_v+1)
-          mooseError("Group number ", GroupScheme_v.size(), " not correct");
+      }
+      if (GroupScheme_v.back() != _num_v)
+        GroupScheme_v[GroupScheme_v.size()-1] = _num_v;
+      if (GroupScheme_v.size() != _Ng_v+1)
+        mooseError("Group number ", GroupScheme_v.size(), " not correct");
     }
-//append intersitial group scheme
-    if(_Ng_i>0){
-        int single_i_group = _single_i_group+1;//1. 2. 3. each as a group, [1 2) [2 3) [3 4)
-        int count = 0;
-        for(int i=1;i<=single_i_group;i++){
-            GroupScheme_i.push_back(-i);//make negative to distinguish from vacancy type
-            count++;
- //           printf("add %d\n",-i);
+
+    // append intersitial group scheme
+    if (_Ng_i>0)
+    {
+      //1. 2. 3. each as a group, [1 2) [2 3) [3 4)
+      int single_i_group = _single_i_group + 1;
+      int count = 0;
+      for (int i = 1; i <= single_i_group; ++i)
+      {
+        GroupScheme_i.push_back(-i);//make negative to distinguish from vacancy type
+        count++;
+        // printf("add %d\n",-i);
+      }
+
+      if (_single_i_group<_Ng_i){
+        int interval = (int)(_num_i-single_i_group)/(_Ng_i-single_i_group+1);
+        for(int i=single_i_group+interval;count<=_Ng_i;)
+        {
+          GroupScheme_i.push_back(-i);
+          count++;
+          // printf("add %d\n",-i);
+          i += interval;
         }
-        if(_single_i_group<_Ng_i){
-          int interval = (int)(_num_i-single_i_group)/(_Ng_i-single_i_group+1);
-          for(int i=single_i_group+interval;count<=_Ng_i;){
-              GroupScheme_i.push_back(-i);
-              count++;
- //             printf("add %d\n",-i);
-              i += interval;
-          }
-        }
-        if(GroupScheme_i.back() != -_num_i) GroupScheme_i[GroupScheme_i.size()-1] = -_num_i;
-        if((int)(GroupScheme_i.size()) != _Ng_i+1)
-          mooseError("Group number ", GroupScheme_i.size(), " not correct");
+      }
+      if (GroupScheme_i.back() != -_num_i)
+        GroupScheme_i[GroupScheme_i.size()-1] = -_num_i;
+      if (GroupScheme_i.size() != _Ng_i + 1)
+        mooseError("Group number ", GroupScheme_i.size(), " not correct");
     }
   }
-  else if(_GroupScheme=="Gaussian"){
-    if(_sigma<0)
+  else if (_GroupScheme=="Gaussian")
+  {
+    if (_sigma<0)
       mooseError("Gaussian Group Scheme setting not correct");
     auto gauss = [](Real x, Real sigma){ return 1.0/sigma/std::sqrt(2.0*3.141592653589793)*std::exp(-x*x/(2.0*sigma*sigma));};
-//add vacancy group scheme
-    if(_Ng_v>0){
-        int single_v_group = _single_v_group+1;//1. 2. 3. each as a group, [1 2) [2 3) [3 4)
-        for(int i=1;i<=single_v_group;i++){
-            GroupScheme_v.push_back(i);
-//            printf("add %d\n",GroupScheme_v.back());
-        }
-        if(_single_v_group<_Ng_v){
-          int count = single_v_group;
-          Real interval = 4.0*_sigma/(_Ng_v-_single_v_group);
-          Real start = -2.0*_sigma;
-          Real factor = 1.0/gauss(start,_sigma);
-          Real x = start;
-          int n_inc;
-          for(int i=single_v_group+1;i<=_Ng_v+1;i++){
-            int n_inc = (int)(_boosting_factor*std::max(1.0,factor*gauss(x,_sigma)));
-            count += n_inc;
-            x += interval;
-            GroupScheme_v.push_back(count);
-          }
-        }
-        printf("maximum v size: %d\n",GroupScheme_v.back());
 
-    }
-//append intersitial group scheme
-    if(_Ng_i>0){
-        int single_i_group = _single_i_group+1;//1. 2. 3. each as a group, [1 2) [2 3) [3 4)
-        for(int i=1;i<=single_i_group;i++){
-            GroupScheme_i.push_back(-i);//make negative to distinguish from vacancy type
- //           printf("add %d\n",-i);
-        }
-        if(_single_i_group<_Ng_i){
-          int count = single_i_group;
-          Real interval = 4.0*_sigma/(_Ng_i-_single_i_group);
-          Real start = -2.0*_sigma;
-          Real factor = 1.0/gauss(start,_sigma);
-          Real x = start;
-          int n_inc;
-          for(int i=single_i_group+1;i<=_Ng_i+1;i++){
-            n_inc = (int)(_boosting_factor*std::max(1.0,factor*gauss(x,_sigma)));
-            count += n_inc;
-            x += interval;
-            GroupScheme_i.push_back(-count);
-          }
-        }
-        printf("maximum i size: %d\n",GroupScheme_i.back());
+    // add vacancy group scheme
+    if (_Ng_v>0)
+    {
+      int single_v_group = _single_v_group+1;//1. 2. 3. each as a group, [1 2) [2 3) [3 4)
+      for (int i = 1; i <= single_v_group; ++i)
+      {
+        GroupScheme_v.push_back(i);
+        // printf("add %d\n",GroupScheme_v.back());
       }
+
+      if (_single_v_group < _Ng_v)
+      {
+        int count = single_v_group;
+        Real interval = 4.0*_sigma/(_Ng_v-_single_v_group);
+        Real start = -2.0*_sigma;
+        Real factor = 1.0/gauss(start,_sigma);
+        Real x = start;
+
+        for (int i = single_v_group + 1; i <= _Ng_v + 1; ++i)
+        {
+          const int n_inc = _boosting_factor * std::max(1.0,factor*gauss(x,_sigma));
+          count += n_inc;
+          x += interval;
+          GroupScheme_v.push_back(count);
+        }
+      }
+      _console << "maximum v size: " << GroupScheme_v.back() << '\n';
+    }
+
+    // append interstitial group scheme
+    if (_Ng_i > 0)
+    {
+      //1. 2. 3. each as a group, [1 2) [2 3) [3 4)
+      int single_i_group = _single_i_group + 1;
+      for (int i = 1; i <= single_i_group; ++i)
+      {
+        GroupScheme_i.push_back(-i);//make negative to distinguish from vacancy type
+        // printf("add %d\n",-i);
+      }
+
+      if (_single_i_group < _Ng_i)
+      {
+        int count = single_i_group;
+        Real interval = 4.0*_sigma/(_Ng_i-_single_i_group);
+        Real start = -2.0*_sigma;
+        Real factor = 1.0/gauss(start,_sigma);
+        Real x = start;
+        for (int i = single_i_group + 1; i <= _Ng_i + 1; ++i)
+        {
+          const int n_inc = _boosting_factor * std::max(1.0,factor*gauss(x,_sigma));
+          count += n_inc;
+          x += interval;
+          GroupScheme_i.push_back(-count);
+        }
+      }
+      _console << "maximum v size: " << GroupScheme_i.back() << '\n';
+    }
   }
   else
-    mooseError("Group shceme: ", _GroupScheme, " not correct");
-
-
+    mooseError("Group scheme: ", _GroupScheme, " not correct");
 }
 
 void
@@ -237,47 +261,52 @@ void
 GroupConstant::setGroupConstant(){
   Real val = 0.0;
 
-//emission coefs
-  for(int i=1;i<=_Ng_v;i++)
+  // emission coefs
+  for (int i = 1; i <= _Ng_v; ++i)
     _emit_array.insert(std::make_pair(i,emit_gc(GroupScheme_v[i-1],GroupScheme_v[i])));
-  for(int i=1;i<=_Ng_i;i++)
+  for (int i = 1; i <= _Ng_i; ++i)
     _emit_array.insert(std::make_pair(-i,emit_gc(GroupScheme_i[i-1],GroupScheme_i[i])));
-
 
   int total_mobile_v =(int)_v_size.size();
   int total_mobile_i =(int)_i_size.size();
 
-//dislocation absorption coefs
-  for(int i=1;i<=total_mobile_v;i++)
+  // dislocation absorption coefs
+  for (int i = 1; i <= total_mobile_v; ++i)
     _disl_array.insert(std::make_pair(i,disl_gc(GroupScheme_v[i-1],GroupScheme_v[i])));
-  for(int i=1;i<=total_mobile_i;i++)
+  for (int i = 1; i <= total_mobile_i; ++i)
     _disl_array.insert(std::make_pair(-i,disl_gc(GroupScheme_i[i-1],GroupScheme_i[i])));
 
-//diffusion coefs
-  for(int i=1;i<=total_mobile_v;i++)
+  // diffusion coefs
+  for (int i = 1; i <= total_mobile_v; ++i)
     _diff_array.insert(std::make_pair(i,disl_gc(GroupScheme_v[i-1],GroupScheme_v[i])));
-  for(int i=1;i<=total_mobile_i;i++)
+  for (int i = 1; i <= total_mobile_i; ++i)
     _diff_array.insert(std::make_pair(-i,disl_gc(GroupScheme_i[i-1],GroupScheme_i[i])));
 
-//absorption coefficients
-  for(int i=1;i<=_Ng_v;i++){
-    for(int j=1;j<=total_mobile_v;j++){
+  // absorption coefficients
+  for (int i = 1; i <=_Ng_v; ++i)
+  {
+    for (int j=1;j<=total_mobile_v;j++)
+    {
       val = absorb_gc(GroupScheme_v[i-1],GroupScheme_v[i],GroupScheme_v[j-1],GroupScheme_v[j]);
       _absorb_matrix.insert(std::make_pair(std::make_pair(i,j),val));
     }
-    for(int j=1;j<=total_mobile_i;j++){
+    for (int j=1;j<=total_mobile_i;j++)
+    {
       val = absorb_gc(GroupScheme_v[i-1],GroupScheme_v[i],GroupScheme_i[j-1],GroupScheme_i[j]);
       _absorb_matrix.insert(std::make_pair(std::make_pair(i,-j),val));
     }
   }
 
-  for(int i=1;i<=_Ng_i;i++){
-    for(int j=1;j<=total_mobile_v;j++){
+  for (int i=1;i<=_Ng_i;i++)
+  {
+    for (int j=1;j<=total_mobile_v;j++)
+    {
       val= absorb_gc(GroupScheme_i[i-1],GroupScheme_i[i],GroupScheme_v[j-1],GroupScheme_v[j]);
      // printf("iv: %d %d %f\n",i,j,val);
       _absorb_matrix.insert(std::make_pair(std::make_pair(-i,j),val));
     }
-    for(int j=1;j<=total_mobile_i;j++){
+    for (int j=1;j<=total_mobile_i;j++)
+    {
       val = absorb_gc(GroupScheme_i[i-1],GroupScheme_i[i],GroupScheme_i[j-1],GroupScheme_i[j]);
      // printf("ii: %d %d %f\n",i,j,val);
       _absorb_matrix.insert(std::make_pair(std::make_pair(-i,-j),val));
@@ -286,15 +315,15 @@ GroupConstant::setGroupConstant(){
 
 
   //print out coefficients for test
-/*
-  for(int i=0;i<_Ng_v;i++)
-      printf("emission from size %d : %f\n",i+1,_emit_array[i]);
-  for(int i=0;i<_Ng_i;i++)
-      printf("emission from size %d : %f\n",-i-1,_emit_array[-i]);
-  */
-//  for(DoubleKey::iterator it=_absorb_matrix.begin();it!=_absorb_matrix.end();it++){
-//      std::cout << (it->first).first << " "<< (it->first).second << " "  << it->second << std::endl;
-//  }
+  /*
+    for(int i=0;i<_Ng_v;i++)
+        printf("emission from size %d : %f\n",i+1,_emit_array[i]);
+    for(int i=0;i<_Ng_i;i++)
+        printf("emission from size %d : %f\n",-i-1,_emit_array[-i]);
+    */
+  //  for(DoubleKey::iterator it=_absorb_matrix.begin();it!=_absorb_matrix.end();it++){
+  //      std::cout << (it->first).first << " "<< (it->first).second << " "  << it->second << std::endl;
+  //  }
 }
 
 Real
@@ -306,7 +335,7 @@ GroupConstant::emit_gc(int cr_start, int cr_end) //[cr_start,cr_end)
   //std::cout<< "max long int: " << std::numeric_limits<long int>::max() << std::endl;
 
   int multiply = ((cr_start>0)&&(cr_end>0)) || ((cr_start<0)&&(cr_end<0));
-  if(!(pos_start<pos_end) || multiply <= 0){
+  if (!(pos_start<pos_end) || multiply <= 0){
       //printf("what %d %d %d %d %d\n", cr_start,cr_end,pos_start,pos_end,multiply);
       mooseError("Wrong interval terminal point in emit_gc function");
   }
@@ -411,8 +440,8 @@ GroupConstant::absorb_gc(int ot_start, int ot_end, int cr_start, int cr_end) //[
   Real sum = 0.0;
   Real counter = 0.0;
   int tagi = 0,tagj = 0;//denote mobility: 0, imobile, 1, mobile
-  int total_mobile_v = (int)_v_size.size();
-  int total_mobile_i = (int)_i_size.size();
+  // int total_mobile_v = (int)_v_size.size();
+  // int total_mobile_i = (int)_i_size.size();
 
  // if(ot_start >= _single_v_group && cr_start >= _single_v_group) return 0.0;
   if(ot_start>0 && cr_start>0){//vv reaction

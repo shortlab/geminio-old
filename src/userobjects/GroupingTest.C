@@ -26,61 +26,56 @@ GroupingTest::GroupingTest(const InputParameters & parameters)
 printf("GroupingTest constructed\n");
 }
 
-void GroupingTest::initialize()
+Real
+GroupingTest::energy(int s,std::string species, std::string Etype) const
 {
+  //unit:eV
+  Real E=0.0;
+  if ((species == "V") && (Etype == "migration"))
+  {
+    // from literature
+    switch (s)
+    {
+      case 1:
+        E = 1.1;//TODO:use 1.3 from another ref: Cluster dynamics simulation of point defect clusters in neutron
+        break;
+
+      default:
+        E = INF;
+    }
+  }
+  else if ((species == "I") && (Etype == "migration")){
+    switch (s)
+    {
+      case 1:
+        E = 1.1;//TODO:use 1.3 from another ref: Cluster dynamics simulation of point defect clusters in neutron
+        break;
+
+      default:
+        E = INF;
+    }
+  }
+  else if ((species == "V") && (Etype == "binding"))
+  {
+    Real Ef=1.77,gamma=1.0/1.6022e-7;//ev/um^2
+    Real r = pow(s*Vatom*3/4/PI,1.0/3); //cluster effective radius
+    return Ef-2*gamma*Vatom/r;
+  }
+  else if ((species == "I") && (Etype == "binding"))
+  {
+    Real Ef=1.77,gamma=1.0/1.6022e-7;//ev/um^2
+    Real r = pow(s*Vatom*3/4/PI,1.0/3); //cluster effective radius
+    return Ef-2*gamma*Vatom/r;
+  }
+  else
+    mooseError("Energy not defined for " + Etype + " " + species);
+  return E;
 }
 
-void GroupingTest::execute()
+Real GroupingTest::D_prefactor(int /*s*/, std::string /*species*/) const
 {
-}
-
-void GroupingTest::finalize()
-{
-}
-
-Real GroupingTest::energy(int s,std::string species, std::string Etype) const{//unit:eV
-    Real E=0.0;
-    if ((species == "V") && (Etype == "migration")){
-//// from literature
-        switch(s){
-            case 1:
-            {
-                E = 1.1;//TODO:use 1.3 from another ref: Cluster dynamics simulation of point defect clusters in neutron
-                break;
-            }
-            default:
-                E = INF;
-        }
-    }
-    else if ((species == "I") && (Etype == "migration")){
-        switch(s){
-            case 1:
-            {
-                E = 1.1;//TODO:use 1.3 from another ref: Cluster dynamics simulation of point defect clusters in neutron
-                break;
-            }
-            default:
-                E = INF;
-        }
-    }
-    else if ((species == "V") && (Etype == "binding")){
-        Real Ef=1.77,gamma=1.0/1.6022e-7;//ev/um^2
-        Real r = pow(s*Vatom*3/4/PI,1.0/3); //cluster effective radius
-        return Ef-2*gamma*Vatom/r;
-    }
-    else if ((species == "I") && (Etype == "binding")) {
-        Real Ef=1.77,gamma=1.0/1.6022e-7;//ev/um^2
-        Real r = pow(s*Vatom*3/4/PI,1.0/3); //cluster effective radius
-        return Ef-2*gamma*Vatom/r;
-    }
-    else
-        mooseError("Energy not defined for " + Etype + " " + species);
-    return E;
-}
-
-Real GroupingTest::D_prefactor(int s, std::string species) const{
-    Real D0 = 1.0e6;//um^2/s
-    return D0;
+  Real D0 = 1.0e6;//um^2/s
+  return D0;
 }
 
 //size S1 and S2
@@ -105,10 +100,14 @@ Real GroupingTest::diff(int S1, std::string C1,Real T) const {
 	return D_prefactor(S1,C1)*exp(-energy(S1,C1,"migration")/Boltz_const/T);
 }//in um^2/s
 
-Real GroupingTest::emit(int S1, int S2, Real T, std::string C1, std::string C2, int tag1, int tag2) const{
-    //for now only consider self species emmision, S1 emits S2, S1==1
-    Real emit_c = 0.0;
-    if (S1 > S2 && S2==1)
-        emit_c = absorb(S1,S2,C1,C1,T,tag1,tag2)/(Vatom) *exp(-energy(S1,C1,"binding")/Boltz_const/T);//unit:/s only emit point defect of the same species
-    return emit_c;
+Real
+GroupingTest::emit(int S1, int S2, Real T, std::string C1, std::string /*C2*/, int tag1, int tag2) const
+{
+  //for now only consider self species emission, S1 emits S2, S1==1
+  Real emit_c = 0.0;
+  if (S1 > S2 && S2==1)
+    emit_c = absorb(S1,S2,C1,C1,T,tag1,tag2)/(Vatom) *exp(-energy(S1,C1,"binding")/Boltz_const/T);
+
+  // unit:/s only emit point defect of the same species
+  return emit_c;
 }
