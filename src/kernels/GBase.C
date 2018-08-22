@@ -39,10 +39,6 @@ GBase::GBase(const InputParameters & parameters)
 {
   NonlinearVariableName cur_var_name = getParam<NonlinearVariableName>("variable");
   _cur_size = getGroupNumber(cur_var_name);
-  if (_cur_size > 0 && _cur_size < _max_mobile_v)
-    mooseError("Please check the mobile vacancy cluster size range, should be immobile > mobile");
-  else if (_cur_size < 0 && -_cur_size < _max_mobile_i)
-    mooseError("Please check the mobile interstitial cluster size range, should be immobile>mobile");
 
   auto num_v_coupled = coupledComponents("coupled_v_vars");
   _no_v_vars.resize(num_v_coupled);

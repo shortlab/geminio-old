@@ -12,7 +12,6 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-//calculate void swelling from variable vaules with grouping method
 #include "GVoidSwelling.h"
 
 template<>
@@ -53,4 +52,3 @@ GVoidSwelling::computeValue()
 
   return total_vacancy*_gc._atomic_vol;
 }
-

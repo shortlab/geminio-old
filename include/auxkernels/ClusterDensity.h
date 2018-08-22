@@ -20,31 +20,23 @@
 //Forward Declarations
 class ClusterDensity;
 
-/**
- * validParams returns the parameters that this Kernel accepts / needs
- * The actual body of the function MUST be in the .C file.
- */
 template<>
 InputParameters validParams<ClusterDensity>();
 
+/**
+ * calculate void swelling from variable values with discrete cluster dynamics method
+ */
 class ClusterDensity : public AuxKernel
 {
 public:
-
-  ClusterDensity(const 
-                   InputParameters & parameters);
+  ClusterDensity(const InputParameters & parameters);
 
 protected:
   virtual Real computeValue();
 
-  /**
-   * This MooseArray will hold the reference we need to our
-   * material property from the Material class
-   */
-
   Real _scaling_factor;
   std::vector<unsigned int> _no_vars;
   std::vector<const VariableValue *> _val_vars;
-
 };
-#endif
+
+#endif // CLUSTERDENSITY_H

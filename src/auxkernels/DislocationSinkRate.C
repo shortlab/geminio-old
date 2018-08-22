@@ -19,30 +19,27 @@ InputParameters validParams<DislocationSinkRate>()
 {
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredParam<std::string>("Diffusivity","The diffusivity to use in this calculation");
-//  params.addRequiredParam<Real>("Diffusivity","The diffusivity to use in this calculation");
+  // params.addRequiredParam<Real>("Diffusivity","The diffusivity to use in this calculation");
   params.addParam<std::string>("DislocationDensity","","The location-dependent density of dislocations from material properties");
   params.addCoupledVar("VariedDislocation",1.0e-4,"The location-dependent density of dislocations");
   params.addParam<Real>("DislocationCoreSize", 10, "The core size of a dislocation, relative to this defect [nm]");
   return params;
 }
 
-
-DislocationSinkRate::DislocationSinkRate(const
-                                   InputParameters & parameters)
-  :AuxKernel(parameters),
-   _prop_name_D(getParam<std::string>("Diffusivity")),
-   _D_species(getMaterialProperty<Real>(_prop_name_D)),
-//   _D_species(getParam<Real>("Diffusivity")),
-   _prop_name_DD(getParam<std::string>("DislocationDensity")),
-   _dislocation_density(getMaterialProperty<Real>(_prop_name_DD)),
-   _varied_dislocation(coupledValue("VariedDislocation")),
-   _dislocation_core_size(getParam<Real>("DislocationCoreSize"))
-
+DislocationSinkRate::DislocationSinkRate(const InputParameters & parameters)
+  : AuxKernel(parameters),
+    _prop_name_D(getParam<std::string>("Diffusivity")),
+    _D_species(getMaterialProperty<Real>(_prop_name_D)),
+    // _D_species(getParam<Real>("Diffusivity")),
+    _prop_name_DD(getParam<std::string>("DislocationDensity")),
+    _dislocation_density(getMaterialProperty<Real>(_prop_name_DD)),
+    _varied_dislocation(coupledValue("VariedDislocation")),
+    _dislocation_core_size(getParam<Real>("DislocationCoreSize"))
 {}
 
 Real
 DislocationSinkRate::computeValue()
-{ 
+{
   if (!_prop_name_DD.empty() && isParamValid("VariedDislocation"))
      mooseError("Error: too many dislocation density provided" );
   if (_prop_name_DD.empty() && !(isParamValid("VariedDislocation")))

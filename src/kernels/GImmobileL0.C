@@ -24,6 +24,10 @@ InputParameters validParams<GImmobileL0>()
 
 GImmobileL0::GImmobileL0(const InputParameters & parameters) : GBase(parameters)
 {
+  if (_cur_size > 0 && _cur_size < _max_mobile_v)
+    mooseError("Please check the mobile vacancy cluster size range, should be immobile > mobile");
+  else if (_cur_size < 0 && -_cur_size < _max_mobile_i)
+    mooseError("Please check the mobile interstitial cluster size range, should be immobile>mobile");
 }
 
 Real

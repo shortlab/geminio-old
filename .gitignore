@@ -32,6 +32,7 @@
 include/base/GeminioRevision.h
 build
 lib
+.libs
 .clang-format
 Geminio-opt
 Geminio-oprof

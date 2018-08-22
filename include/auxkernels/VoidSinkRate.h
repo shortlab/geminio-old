@@ -20,32 +20,21 @@
 //Forward Declarations
 class VoidSinkRate;
 
-/**
- * validParams returns the parameters that this AuxKernel accepts / needs
- * The actual body of the function MUST be in the .C file.
- */
 template<>
 InputParameters validParams<VoidSinkRate>();
 
 class VoidSinkRate : public AuxKernel
 {
 public:
-
-  VoidSinkRate(const 
-                   InputParameters & parameters);
+  VoidSinkRate(const  InputParameters & parameters);
 
 protected:
   virtual Real computeValue();
-
-  /**
-   * This MooseArray will hold the reference we need to our
-   * material property from the Material class
-   */
 
   std::string _prop_name_D;
   const MaterialProperty<Real> & _D_species;
   const VariableValue & _void_density;
   const VariableValue & _average_void_radius;
-
 };
-#endif //VOIDSINKRATE_H
+
+#endif // VOIDSINKRATE_H

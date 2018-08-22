@@ -20,27 +20,16 @@
 //Forward Declarations
 class DislocationSinkRate;
 
-/**
- * validParams returns the parameters that this AuxKernel accepts / needs
- * The actual body of the function MUST be in the .C file.
- */
 template<>
 InputParameters validParams<DislocationSinkRate>();
 
 class DislocationSinkRate : public AuxKernel
 {
 public:
-
-  DislocationSinkRate(const 
-                   InputParameters & parameters);
+  DislocationSinkRate(const InputParameters & parameters);
 
 protected:
   virtual Real computeValue();
-
-  /**
-   * This MooseArray will hold the reference we need to our
-   * material property from the Material class
-   */
 
   std::string _prop_name_D;
   const MaterialProperty<Real> & _D_species;
@@ -49,6 +38,6 @@ protected:
   const MaterialProperty<Real> & _dislocation_density;
   const VariableValue & _varied_dislocation;
   Real _dislocation_core_size;
-
 };
-#endif //DISLOCATIONSINKRATE_H
+
+#endif // DISLOCATIONSINKRATE_H

@@ -21,34 +21,27 @@
 //Forward Declarations
 class GSumSIAClusterDensity;
 
-/**
- * validParams returns the parameters that this Kernel accepts / needs
- * The actual body of the function MUST be in the .C file.
- */
 template<>
 InputParameters validParams<GSumSIAClusterDensity>();
 
+/**
+ * Calculate total density of SIA cluster in range [lower_bounds,upper_bound]
+ * from variable values with grouping method
+ */
 class GSumSIAClusterDensity : public AuxKernel
 {
 public:
-
-  GSumSIAClusterDensity(const 
-                   InputParameters & parameters);
+  GSumSIAClusterDensity(const InputParameters & parameters);
 
 protected:
   virtual Real computeValue();
 
-  /**
-   * This MooseArray will hold the reference we need to our
-   * material property from the Material class
-   */
-
   const GGroup & _gc;
   Real _scale_factor;
-  int _lower_bound;
-  int _upper_bound;
+  unsigned int _lower_bound;
+  unsigned int _upper_bound;
   std::vector<unsigned int> _no_vars;
   std::vector<const VariableValue *> _val_vars;
-
 };
-#endif
+
+#endif // GSUMSIACLUSTERDENSITY_H

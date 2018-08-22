@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
   GeminioApp::registerApps();
 
   // Create an instance of the application and store it in a smart pointer for easy cleanup
-  std::shared_ptr<MooseApp> app = AppFactory::createAppShared("MagpieApp", argc, argv);
+  std::shared_ptr<MooseApp> app = AppFactory::createAppShared("GeminioApp", argc, argv);
 
   // Execute the application
   app->run();

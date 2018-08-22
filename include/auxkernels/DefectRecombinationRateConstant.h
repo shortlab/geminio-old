@@ -20,32 +20,21 @@
 //Forward Declarations
 class DefectRecombinationRateConstant;
 
-/**
- * validParams returns the parameters that this AuxKernel accepts / needs
- * The actual body of the function MUST be in the .C file.
- */
 template<>
 InputParameters validParams<DefectRecombinationRateConstant>();
 
 class DefectRecombinationRateConstant : public AuxKernel
 {
 public:
-
-  DefectRecombinationRateConstant(const 
-                   InputParameters & parameters);
+  DefectRecombinationRateConstant(const InputParameters & parameters);
 
 protected:
   virtual Real computeValue();
-
-  /**
-   * This MooseArray will hold the reference we need to our
-   * material property from the Material class
-   */
 
   const MaterialProperty<Real> & _D_v;
   const MaterialProperty<Real> & _D_i;
   const MaterialProperty<Real> & _lattice_parameter;
   const MaterialProperty<Real> & _atomic_volume;
-
 };
-#endif //DEFECTRECOMBINATIONRATECONSTANT_H
+
+#endif // DEFECTRECOMBINATIONRATECONSTANT_H

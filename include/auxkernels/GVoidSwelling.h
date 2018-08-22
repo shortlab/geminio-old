@@ -21,31 +21,23 @@
 //Forward Declarations
 class GVoidSwelling;
 
-/**
- * validParams returns the parameters that this Kernel accepts / needs
- * The actual body of the function MUST be in the .C file.
- */
 template<>
 InputParameters validParams<GVoidSwelling>();
 
+/**
+ * Calculate void swelling from variable vaules with grouping method
+ */
 class GVoidSwelling : public AuxKernel
 {
 public:
-
-  GVoidSwelling(const 
-                   InputParameters & parameters);
+  GVoidSwelling(const InputParameters & parameters);
 
 protected:
   virtual Real computeValue();
 
-  /**
-   * This MooseArray will hold the reference we need to our
-   * material property from the Material class
-   */
-
   const GGroup & _gc;
   std::vector<unsigned int> _no_v_vars;
   std::vector<const VariableValue *> _val_v_vars;
-
 };
-#endif
+
+#endif // GVOIDSWELLING_H

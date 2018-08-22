@@ -27,7 +27,7 @@ GTungsten::GTungsten(const InputParameters & parameters)
   Eib2 = 2.12; // binding energy for interstitial cluster size 2
   Evb2 = -0.1; // binding energy for vacancy cluster size 2
   Ei_binding_factor = (Eib2-Ei_formation)/ (std::pow(2.0,2.0/3)-1);
-  Ev_binding_factor = (Evb2-Ev_formation)/(pow(2.0,2.0/3)-1);
+  Ev_binding_factor = (Evb2-Ev_formation)/(std::pow(2.0,2.0/3)-1);
 }
 
 Real
