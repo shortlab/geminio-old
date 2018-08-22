@@ -68,18 +68,19 @@ GGroup::GGroup(const InputParameters & parameters) :
     }
     GroupScheme_v.reserve(_Ng_v+1);
     GroupScheme_i.reserve(_Ng_i+1);
-     
+
     GroupScheme_v_sq = new Real[_Ng_v];
     GroupScheme_v_avg = new Real[_Ng_v];
     GroupScheme_v_del = new int[_Ng_v];
     GroupScheme_i_sq = new Real[_Ng_i];
     GroupScheme_i_avg = new Real[_Ng_i];
     GroupScheme_i_del = new int[_Ng_i];
-  
+
     setGroupScheme();
 }
 
-GGroup::~GGroup(){
+GGroup::~GGroup()
+{
   delete[] GroupScheme_v_sq;
   delete[] GroupScheme_v_del;
   delete[] GroupScheme_i_sq;
@@ -91,123 +92,130 @@ GGroup::~GGroup(){
 void
 GGroup::initialize()
 {
-//print grouping info
-  if (DEBUG){
+  //print grouping info
+  if (DEBUG)
+  {
     int num_groups = GroupScheme_v.size();
     for(int i=0;i<num_groups;i++){
-        printf("group ID: %d; value: %d\n",i+1,GroupScheme_v[i]); 
+        printf("group ID: %d; value: %d\n",i+1,GroupScheme_v[i]);
     }
     num_groups = GroupScheme_i.size();
     for(int i=0;i<num_groups;i++){
-        printf("group ID: %d; value: %d\n",-i-1,GroupScheme_i[i]); 
+        printf("group ID: %d; value: %d\n",-i-1,GroupScheme_i[i]);
     }
   }
 }
 
 void
-GGroup::setGroupScheme(){//total _Ng group, _Ng+1 node
-  if(_GroupScheme=="Uniform"){
-    if(_num_v < _Ng_v || _num_i < _Ng_i)
-        mooseError("Size setting not correct");
-//add vacancy group scheme
-    if(_Ng_v>0){
-        int single_v_group = _single_v_group+1;//1. 2. 3. each as a group, [1 2) [2 3) [3 4)
-        for(int i=1;i<=single_v_group;i++){
-            GroupScheme_v.push_back(i);
-//            printf("add %d\n",GroupScheme_v.back());
+GGroup::setGroupScheme()
+{
+  //total _Ng group, _Ng+1 node
+  if (_GroupScheme=="Uniform")
+  {
+    if (_num_v < _Ng_v || _num_i < _Ng_i)
+      mooseError("Size setting not correct");
+
+    //add vacancy group scheme
+    if (_Ng_v > 0)
+    {
+      int single_v_group = _single_v_group+1;//1. 2. 3. each as a group, [1 2) [2 3) [3 4)
+      for (int i=1;i<=single_v_group;i++){
+        GroupScheme_v.push_back(i);
+        // printf("add %d\n",GroupScheme_v.back());
+      }
+
+      if (_single_v_group<_Ng_v){
+        Real interval = 1.0*(_num_v-single_v_group)/(_Ng_v-_single_v_group);
+        for(int i=1;i<(_Ng_v-_single_v_group+1);i++){
+          int next_size = (int)(single_v_group+i*interval);
+          GroupScheme_v.push_back(next_size);
         }
-        if(_single_v_group<_Ng_v){
-          double interval = 1.0*(_num_v-single_v_group)/(_Ng_v-_single_v_group);
-          for(int i=1;i<(_Ng_v-_single_v_group+1);i++){
-              int next_size = (int)(single_v_group+i*interval);
-              GroupScheme_v.push_back(next_size);
-          }
-        }
-        if(GroupScheme_v.back() != _num_v) GroupScheme_v[GroupScheme_v.size()-1] = _num_v;
-        if((int)(GroupScheme_v.size()) != _Ng_v+1)
-          mooseError("Group number ", GroupScheme_v.size(), " not correct");
-        //shift to left by one (x1,x2],consistent with Golubov's paper
-        for(int i=0;i<_Ng_v+1;i++)
-          GroupScheme_v[i] -= 1;
+      }
+      if(GroupScheme_v.back() != _num_v) GroupScheme_v[GroupScheme_v.size()-1] = _num_v;
+      if((int)(GroupScheme_v.size()) != _Ng_v+1)
+      mooseError("Group number ", GroupScheme_v.size(), " not correct");
+      //shift to left by one (x1,x2],consistent with Golubov's paper
+      for(int i=0;i<_Ng_v+1;i++)
+      GroupScheme_v[i] -= 1;
     }
-//append intersitial group scheme
+    //append intersitial group scheme
     if(_Ng_i>0){
-        int single_i_group = _single_i_group+1;//1. 2. 3. each as a group, [1 2) [2 3) [3 4)
-        for(int i=1;i<=single_i_group;i++){
-            GroupScheme_i.push_back(i);//make negative to distinguish from vacancy type
+      int single_i_group = _single_i_group+1;//1. 2. 3. each as a group, [1 2) [2 3) [3 4)
+      for(int i=1;i<=single_i_group;i++){
+        GroupScheme_i.push_back(i);//make negative to distinguish from vacancy type
+      }
+      if(_single_i_group<_Ng_i){
+        Real interval = 1.0*(_num_i-single_i_group)/(_Ng_i-_single_i_group);
+        for(int i=1;i<(_Ng_i-_single_i_group+1);i++){
+          int next_size = (int)(single_i_group+i*interval);
+          GroupScheme_i.push_back(next_size);
         }
-        if(_single_i_group<_Ng_i){
-          double interval = 1.0*(_num_i-single_i_group)/(_Ng_i-_single_i_group);
-          for(int i=1;i<(_Ng_i-_single_i_group+1);i++){
-              int next_size = (int)(single_i_group+i*interval);
-              GroupScheme_i.push_back(next_size);
-          }
-        }
-        if(GroupScheme_i.back() != _num_i) GroupScheme_i[GroupScheme_i.size()-1] = _num_i;
-        if((int)(GroupScheme_i.size()) != _Ng_i+1)
-          mooseError("Group number ", GroupScheme_i.size(), " not correct");
-        //shift to left by one (x1,x2],consistent with Golubov's paper
-        for(int i=0;i<_Ng_i+1;i++)
-          GroupScheme_i[i] -= 1;
+      }
+      if(GroupScheme_i.back() != _num_i) GroupScheme_i[GroupScheme_i.size()-1] = _num_i;
+      if((int)(GroupScheme_i.size()) != _Ng_i+1)
+      mooseError("Group number ", GroupScheme_i.size(), " not correct");
+      //shift to left by one (x1,x2],consistent with Golubov's paper
+      for(int i=0;i<_Ng_i+1;i++)
+      GroupScheme_i[i] -= 1;
     }
   }
   else if(_GroupScheme=="RSpace"){
-//add vacancy group scheme
+    //add vacancy group scheme
     if(_Ng_v>0){
-        //1. 2. 3. each as a group, (0,1],(1,2], (2,3]
-        for(int i=0;i<=_single_v_group;i++)
-            GroupScheme_v.push_back(i);
-        int tmp = _single_v_group;
-        while(tmp++<_Ng_v){
-            int delta_size = (int)(_dr_coef*std::pow(GroupScheme_v.back(),2.0/3));
-            int next_size = GroupScheme_v.back()+((delta_size>1)? delta_size:1);
-            GroupScheme_v.push_back(next_size);
-        }
-        printf("maximum v size: %d\n",GroupScheme_v.back());
+      //1. 2. 3. each as a group, (0,1],(1,2], (2,3]
+      for(int i=0;i<=_single_v_group;i++)
+      GroupScheme_v.push_back(i);
+      int tmp = _single_v_group;
+      while(tmp++<_Ng_v){
+        int delta_size = (int)(_dr_coef*std::pow(GroupScheme_v.back(),2.0/3));
+        int next_size = GroupScheme_v.back()+((delta_size>1)? delta_size:1);
+        GroupScheme_v.push_back(next_size);
+      }
+      printf("maximum v size: %d\n",GroupScheme_v.back());
     }
 
     if(_Ng_i>0){
-        //1. 2. 3. each as a group, (0,1],(1,2], (2,3]
-        for(int i=0;i<=_single_i_group;i++)
-            GroupScheme_i.push_back(i);
-        int tmp = _single_i_group;
-        while(tmp++<_Ng_i){
-            int delta_size = (int)(_dr_coef*std::pow(GroupScheme_i.back(),2.0/3));
-            int next_size = GroupScheme_i.back()+((delta_size>1)? delta_size:1);
-            GroupScheme_i.push_back(next_size);
-        }
-        printf("maximum i size: %d\n",GroupScheme_i.back());
-    } 
+      //1. 2. 3. each as a group, (0,1],(1,2], (2,3]
+      for(int i=0;i<=_single_i_group;i++)
+      GroupScheme_i.push_back(i);
+      int tmp = _single_i_group;
+      while(tmp++<_Ng_i){
+        int delta_size = (int)(_dr_coef*std::pow(GroupScheme_i.back(),2.0/3));
+        int next_size = GroupScheme_i.back()+((delta_size>1)? delta_size:1);
+        GroupScheme_i.push_back(next_size);
+      }
+      printf("maximum i size: %d\n",GroupScheme_i.back());
+    }
   }
   else
-    mooseError("Group shceme: ", _GroupScheme, " not correct");
+  mooseError("Group shceme: ", _GroupScheme, " not correct");
 
 
   //calculate the dispersion of each group
   int del;
   for(int i=1;i<=_Ng_v;i++){
     Real minu = 0.0, subt = 0.0;
-    del = GroupScheme_v[i]-GroupScheme_v[i-1]; 
+    del = GroupScheme_v[i]-GroupScheme_v[i-1];
     for(int j=GroupScheme_v[i-1]+1;j<=GroupScheme_v[i];j++){
-     minu += j*j;
-     subt += j; 
+      minu += j*j;
+      subt += j;
     }
     GroupScheme_v_sq[i-1] = (minu-subt*subt/del)/del;
     GroupScheme_v_avg[i-1]= GroupScheme_v[i]-(del-1)/2.0;
     GroupScheme_v_del[i-1] = del;
     //printf("scheme: %d %f %f %d \n",GroupScheme_v[i-1],GroupScheme_v_sq[i-1],GroupScheme_v_avg[i-1],GroupScheme_v_del[i-1]);
-  } 
+  }
   for(int i=1;i<=_Ng_i;i++){
     Real minu = 0.0, subt = 0.0;
     del = (GroupScheme_i[i])-(GroupScheme_i[i-1]);
     for(int j=GroupScheme_i[i-1]+1;j<=GroupScheme_i[i];j++){
-     minu += j*j;
-     subt += j; 
+      minu += j*j;
+      subt += j;
     }
     GroupScheme_i_sq[i-1]= (minu-subt*subt/del)/del;
     GroupScheme_i_avg[i-1]= GroupScheme_i[i]-(del-1)/2.0;
     GroupScheme_i_del[i-1] = del;
-  } 
+  }
 
 }
 
@@ -297,40 +305,48 @@ GGroup::_diff(int clustersize) const //[cr_start,cr_end)
 Real
 GGroup::_absorb(int clustersize1, int clustersize2) const //[ot_start,ot_end),[cr_start,cr_end)
 {
-  Real val = 0.0;
+  // Real val = 0.0;
   Real T = _T_func? _T_func->value(_t,dummy):_T;
   int i = std::abs(clustersize1);
   int j = std::abs(clustersize2);
   int tagi = 0,tagj = 0;//denote mobility: 0, imobile, 1, mobile
   int flag;
-  if(clustersize1>0 && clustersize2>0){//vv 
+  if (clustersize1 > 0 && clustersize2 > 0)
+  {
+    //vv
     if(i<=_v_size)
-        tagi = 1;
+      tagi = 1;
     if(j<=_v_size)
-        tagj = 1;
+      tagj = 1;
+
     //printf("absorb v %d with v %d: %lf \n",i,j,_material->absorb(i,j,"V","V",_T,tagi,tagj));//,absorb(i,j,"V","V",_T,tagi,tagj));
     //return _material->absorb(i,j,"V","V",_T,tagi,tagj);//absorption between i and j
-    flag = tagi + 2*tagj; 
+    flag = tagi + 2*tagj;
     return _material->absorbVV(i,j,flag,T);//flag=0: i j immobile; flag=1: i mobile; flag=2: j mobile; flag=3: i j mobile
   }
-  else if(clustersize1>0 && clustersize2<0){//vi
+  else if (clustersize1>0 && clustersize2<0){
+    //vi
     if(i<=_v_size)
-        tagi = 1;
+      tagi = 1;
     if(j<=_i_size)
-        tagj = 1;
+      tagj = 1;
+
     //printf("absorb v %d with i %d: %lf \n",i,j,_material->absorb(i,j,"V","I",_T,tagi,tagj));//,absorb(i,j,"V","I",_T,tagi,tagj));
     //return _material->absorb(i,j,"V","I",_T,tagi,tagj);//absorption between i and j
-    flag = tagi + 2*tagj; 
+    flag = tagi + 2*tagj;
     return _material->absorbVI(i,j,flag,T);//flag=0: i j immobile; flag=1: i mobile; flag=2: j mobile; flag=3: i j mobile
   }
-  else if(clustersize1<0 && clustersize2>0){//iv
+  else if (clustersize1 < 0 && clustersize2 > 0)
+  {
+    //iv
     if(i<=_i_size)
-        tagi = 1;
+      tagi = 1;
     if(j<=_v_size)
-        tagj = 1;
+      tagj = 1;
+
     //printf("absorb i %d with v %d: %lf\n",i,j,_material->absorb(i,j,"I","V",_T,tagi,tagj));
     //return _material->absorb(i,j,"I","V",_T,tagi,tagj);//absorption between i and j
-    flag = tagj + 2*tagi; 
+    flag = tagj + 2*tagi;
     return _material->absorbVI(j,i,flag,T);//flag=0: both immobile; flag=1: first mobile; flag=2: second mobile; flag=3: both mobile
   }
   else{//ii
@@ -340,7 +356,7 @@ GGroup::_absorb(int clustersize1, int clustersize2) const //[ot_start,ot_end),[c
         tagj = 1;
     //printf("absorb i %d with i %d: %lf\n",i,j,_material->absorb(i,j,"I","I",_T,tagi,tagj));
     //return _material->absorb(i,j,"I","I",_T,tagi,tagj);//absorption between i and j
-    flag = tagi + 2*tagj; 
+    flag = tagi + 2*tagj;
     return _material->absorbII(i,j,flag,T);//flag=0: i j immobile; flag=1: i mobile; flag=2: j mobile; flag=3: i j mobile
   }
 }
@@ -348,14 +364,12 @@ GGroup::_absorb(int clustersize1, int clustersize2) const //[ot_start,ot_end),[c
 
 int
 GGroup::CurrentGroupV(int i) const{
-    std::vector<int>::const_iterator it=std::lower_bound(GroupScheme_v.begin(),GroupScheme_v.end(),i); 
+    std::vector<int>::const_iterator it=std::lower_bound(GroupScheme_v.begin(),GroupScheme_v.end(),i);
     return it-GroupScheme_v.begin();
 }
 
 int
 GGroup::CurrentGroupI(int i) const{
-    std::vector<int>::const_iterator it=std::lower_bound(GroupScheme_i.begin(),GroupScheme_i.end(),i); 
+    std::vector<int>::const_iterator it=std::lower_bound(GroupScheme_i.begin(),GroupScheme_i.end(),i);
     return it-GroupScheme_i.begin();
 }
-
-

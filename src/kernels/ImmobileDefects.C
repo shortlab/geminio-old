@@ -55,7 +55,7 @@ ImmobileDefects::ImmobileDefects(const InputParameters & parameters)
     _no_i_vars.resize(num_i_coupled);
     _val_i_vars.resize(num_i_coupled);
   }
- 
+
 
   for (unsigned int i=0; i < num_v_coupled; ++i){
     _no_v_vars[i] = coupled("coupled_v_vars",i);
@@ -65,7 +65,7 @@ ImmobileDefects::ImmobileDefects(const InputParameters & parameters)
     _no_i_vars[i] = coupled("coupled_i_vars",i);
     _val_i_vars[i] = &coupledValue("coupled_i_vars",i);
   }
-    
+
   //printf("immobile constructed: %s\n",cur_var_name.c_str());
 }
 
@@ -76,7 +76,7 @@ ImmobileDefects::computeQpResidual()
   int i_size = _i_size.size();
   int cur_size;
   Real res_sum = 0.0;
-  //printf("return immobile initial: %f %d\n",res_sum,_cur_size);     
+  //printf("return immobile initial: %f %d\n",res_sum,_cur_size);
 
   if(_cur_size>0){//v type
     cur_size = _cur_size;
@@ -104,21 +104,21 @@ ImmobileDefects::computeQpResidual()
     if(i_size!=0 && cur_size != _number_v){
       tmp = _no_v_vars.size()-v_size-v_size;
       for(int i=0;i<tmp;i++){
-      //  printf("return imm : %d %d %d\n",tmp,v_size,_val_v_vars.size());     
+      //  printf("return imm : %d %d %d\n",tmp,v_size,_val_v_vars.size());
         res_sum -= (*_val_v_vars[v_size+v_size+i])[_qp]*(*_val_i_vars[i])[_qp]*_gc._absorb(-_i_size[i],cur_size+_i_size[i]);
       }
     }
 
-    //v+1 emission gain(+)  
+    //v+1 emission gain(+)
     if(cur_size<_number_v){
-      res_sum -= (*_val_v_vars[v_size+v_size])[_qp]*_gc._emit(cur_size+1);    
+      res_sum -= (*_val_v_vars[v_size+v_size])[_qp]*_gc._emit(cur_size+1);
       //printf("emission %d (+): %d\n",cur_size,cur_size+1);
     }
 
     //v emission loss(-)
     res_sum += _u[_qp]*_gc._emit(cur_size);
     //printf("emission %d (-): %d\n",cur_size,cur_size);
-  
+
   }
 
   else{
@@ -128,20 +128,20 @@ ImmobileDefects::computeQpResidual()
     int tmp_size = std::min(i_size,_number_i-cur_size);
     for(int i=0;i<tmp_size;i++){
       res_sum += (*_val_i_vars[i])[_qp]*_u[_qp]*_gc._absorb(-_i_size[i],-cur_size);
-      //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,-_i_size[i]);     
+      //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,-_i_size[i]);
     }
 
     //iv reaction loss(-)
     for(int i=0;i<v_size;i++){
       res_sum += (*_val_v_vars[i])[_qp]*_u[_qp]*_gc._absorb(_v_size[i],-cur_size);
-      //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,_v_size[i]);     
+      //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,_v_size[i]);
     }
 
     //ii reaction gain(+)
     int tmp = std::min((int)(cur_size/2),i_size);//_i_size.back()==i_size, avoid double count
     for(int i=0;i<tmp;i++){
         res_sum -= (*_val_i_vars[i_size+i])[_qp]*(*_val_i_vars[i])[_qp]*_gc._absorb(-_i_size[i],-cur_size+_i_size[i]);
-        //printf("reaction %d (+): %d %d\n",_cur_size,_i_size[i]-cur_size,-_i_size[i]);     
+        //printf("reaction %d (+): %d %d\n",_cur_size,_i_size[i]-cur_size,-_i_size[i]);
     }
 
     //iv reaction gain(+)
@@ -149,19 +149,19 @@ ImmobileDefects::computeQpResidual()
       tmp = _no_i_vars.size()-i_size-i_size;
       for(int i=0;i<tmp;i++){
         res_sum -= (*_val_i_vars[i_size+i_size+i])[_qp]*(*_val_v_vars[i])[_qp]*_gc._absorb(_v_size[i],-(cur_size+_v_size[i]));
-        //printf("reaction %d (+): %d %d\n",_cur_size,-_v_size[i]-cur_size,_v_size[i]);     
+        //printf("reaction %d (+): %d %d\n",_cur_size,-_v_size[i]-cur_size,_v_size[i]);
       }
     }
 
-    //i+1 emission gain(+)  
+    //i+1 emission gain(+)
     if(cur_size<_number_i){
-      res_sum -= (*_val_i_vars[i_size+i_size])[_qp]*_gc._emit(-cur_size-1);    
-      //printf("emission %d (+): %d\n",_cur_size,-cur_size-1);     
+      res_sum -= (*_val_i_vars[i_size+i_size])[_qp]*_gc._emit(-cur_size-1);
+      //printf("emission %d (+): %d\n",_cur_size,-cur_size-1);
     }
 
     //i emission loss(-)
     res_sum += _u[_qp]*_gc._emit(-cur_size);
-    //printf("emission %d (-): %d\n",_cur_size,-cur_size);     
+    //printf("emission %d (-): %d\n",_cur_size,-cur_size);
   }
 
   return res_sum *_test[_i][_qp];
@@ -191,7 +191,7 @@ ImmobileDefects::computeQpJacobian()
 
     //v emission loss(-)
     jac_sum += _gc._emit(cur_size);
-  
+
   }
 
   else{
@@ -214,9 +214,10 @@ ImmobileDefects::computeQpJacobian()
   return jac_sum *_test[_i][_qp]*_phi[_j][_qp];
 }
 
-Real 
-ImmobileDefects::computeQpOffDiagJacobian(unsigned int jvar){
-      return 0.0;
+Real
+ImmobileDefects::computeQpOffDiagJacobian(unsigned int /*jvar*/)
+{
+  return 0.0;
 }
 
 

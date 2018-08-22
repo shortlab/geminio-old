@@ -59,8 +59,8 @@ AddUserObjectDislocationSink::AddUserObjectDislocationSink(const InputParameters
 void
 AddUserObjectDislocationSink::act()
 {
-  const auto number_v = getParam<unsigned int>("number_v");
-  const auto number_i = getParam<unsigned int>("number_i");
+  // const auto number_v = getParam<unsigned int>("number_v");
+  // const auto number_i = getParam<unsigned int>("number_i");
   std::vector<unsigned int> v_size = getParam<std::vector<unsigned int> >("mobile_v_size");
   std::vector<unsigned int> i_size = getParam<std::vector<unsigned int> >("mobile_i_size");
   std::string uo = getParam<std::string>("group_constant");

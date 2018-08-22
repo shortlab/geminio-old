@@ -63,7 +63,7 @@ MobileDefects::MobileDefects(const InputParameters & parameters)
   }
   NonlinearVariableName cur_var_name = getParam<NonlinearVariableName>("variable");
   _cur_size = getGroupNumber(cur_var_name.c_str());
-  
+
   //printf("mobile constructed: %s\n",cur_var_name.c_str());
 }
 
@@ -76,10 +76,10 @@ MobileDefects::computeQpResidual()
   int vv = _v_size.size();
   int max_vi;
 
-  //printf("return mobile initial: %f %d\n",res_sum,_cur_size);     
+  //printf("return mobile initial: %f %d\n",res_sum,_cur_size);
 
   if(_cur_size>0){//v type
-    cur_size = _cur_size; 
+    cur_size = _cur_size;
     max_vi =  std::min(_cur_size+ii,_number_v);
 
     //vi reaction loss(-)
@@ -89,23 +89,23 @@ MobileDefects::computeQpResidual()
 
     //vv reaction loss(-)
     for(int i=1;i <= _number_v-cur_size;i++){//garantee the largest size doesn't exceed _number_v
-      //printf("reaction %d (-): %d %d\n",cur_size,cur_size,i);     
+      //printf("reaction %d (-): %d %d\n",cur_size,cur_size,i);
       res_sum += (*_val_v_vars[i-1])[_qp]*_u[_qp]*_gc._absorb(cur_size,i);
     }
     if(cur_size*2<=_number_v){
-      //printf("reaction %d (-): %d %d\n",cur_size,cur_size,cur_size);     
+      //printf("reaction %d (-): %d %d\n",cur_size,cur_size,cur_size);
       res_sum += (*_val_v_vars[cur_size-1])[_qp]*_u[_qp]*_gc._absorb(cur_size,cur_size);
     }
-      
-  
+
+
     //vv reaction gain(+)
     for(int i=1;i <= (int)(cur_size/2);i++){
       //if(std::find(_v_size.begin(),_v_size.end(),cur_size-i) != _v_size.end() || std::find(_v_size.begin(),_v_size.end(),i) != _v_size.end()){//TODO: can optimize
-        //printf("reaction %d (+): %d %d\n",cur_size,cur_size-i,cur_size);     
+        //printf("reaction %d (+): %d %d\n",cur_size,cur_size-i,cur_size);
         res_sum -= (*_val_v_vars[cur_size-i-1])[_qp]*(*_val_v_vars[i-1])[_qp]*_gc._absorb(cur_size-i,i);
      // }
     }
-  
+
     //vi reaction gain(+)
     for(int i=cur_size+1;i<=max_vi;i++){
       //if(std::find(_i_size.begin(),_i_size.end(),i-cur_size) != _i_size.end() || std::find(_v_size.begin(),_v_size.end(),i) != _v_size.end()){
@@ -117,18 +117,18 @@ MobileDefects::computeQpResidual()
     //v emission loss(-)
     if(cur_size!=1){
       res_sum += _u[_qp]*_gc._emit(cur_size);
-      //printf("emission %d (-): %d\n",cur_size,cur_size);     
+      //printf("emission %d (-): %d\n",cur_size,cur_size);
     }
-    
+
     //v+1 emission gain(+)
     if(cur_size<_number_v){
       res_sum -= (*_val_v_vars[cur_size])[_qp]*_gc._emit(cur_size+1);
-      //printf("emission gain %d (+): %d\n",cur_size,cur_size+1);     
+      //printf("emission gain %d (+): %d\n",cur_size,cur_size+1);
     }
     if(cur_size==1){
       for(int i=2;i<=_number_v;i++){
         res_sum -= (*_val_v_vars[i-1])[_qp]*_gc._emit(i);
-        //printf("emission gain %d (+): %d\n",cur_size,i);     
+        //printf("emission gain %d (+): %d\n",cur_size,i);
       }
     }
 
@@ -137,58 +137,58 @@ MobileDefects::computeQpResidual()
   }
 
   else{//i type
-   
+
     cur_size = -_cur_size;//make it positive
     max_vi = std::min(cur_size+vv,_number_i);
 
     //iv reaction loss(-)
     for(int i=1;i<=_number_v;i++){
       res_sum += (*_val_v_vars[i-1])[_qp]*_u[_qp]*_gc._absorb(-cur_size,i);
-      //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,i);     
+      //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,i);
     }
 
     //ii reaction loss(-)
     for(int i=1;i <= _number_i-cur_size;i++){//garantee the largest size doesn't exceed _number_v
-      //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,-i);     
+      //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,-i);
       res_sum += (*_val_i_vars[i-1])[_qp]*_u[_qp]*_gc._absorb(-cur_size,-i);
     }
     if(cur_size*2<=_number_i){
       res_sum += (*_val_i_vars[cur_size-1])[_qp]*_u[_qp]*_gc._absorb(-cur_size,-cur_size);
-      //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,_cur_size);     
-    } 
+      //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,_cur_size);
+    }
 
     //ii reaction gain(+)
     for(int i=1;i <= (int)(cur_size/2);i++){
       //if(std::find(_i_size.begin(),_i_size.end(),cur_size-i) != _i_size.end() || std::find(_i_size.begin(),_i_size.end(),i) != _i_size.end()){//TODO: can optimize
         res_sum -= (*_val_i_vars[i-1])[_qp]*(*_val_i_vars[cur_size-i-1])[_qp]*_gc._absorb(i-cur_size,-i);
-        //printf("reaction %d (+): %d %d\n",_cur_size,i-cur_size,-i);     
+        //printf("reaction %d (+): %d %d\n",_cur_size,i-cur_size,-i);
       //}
     }
-  
+
     //iv reaction gain(+)
     for(int i=cur_size+1;i<=max_vi;i++){
       //if(std::find(_v_size.begin(),_v_size.end(),i-cur_size) != _v_size.end() || std::find(_i_size.begin(),_i_size.end(),i) != _i_size.end()){
       if(i-cur_size <= vv || i <= ii){//make sure one is mobile
         res_sum -= (*_val_v_vars[i-cur_size-1])[_qp]*(*_val_i_vars[i-1])[_qp]*_gc._absorb(-i,i-cur_size);
-        //printf("reaction %d (+): %d %d\n",_cur_size,i-cur_size,-i);     
+        //printf("reaction %d (+): %d %d\n",_cur_size,i-cur_size,-i);
       }
     }
 
     //i emission loss(-)
     if(cur_size!=1){
       res_sum += _u[_qp]*_gc._emit(-cur_size);
-      //printf("emission %d (-): %d\n",_cur_size,_cur_size);     
+      //printf("emission %d (-): %d\n",_cur_size,_cur_size);
     }
-    
+
     //i+1 emission gain(+)
     if(cur_size<_number_i){
       res_sum -= (*_val_i_vars[cur_size])[_qp]*_gc._emit(-cur_size-1);
-      //printf("emission %d (+): %d\n",_cur_size,-cur_size-1);     
+      //printf("emission %d (+): %d\n",_cur_size,-cur_size-1);
     }
     if(cur_size==1){
       for(int i=2;i<=_number_i;i++){
         res_sum -= (*_val_i_vars[i-1])[_qp]*_gc._emit(-i);
-       // printf("emission %d (+): %d\n",_cur_size,-i);     
+       // printf("emission %d (+): %d\n",_cur_size,-i);
       }
     }
 
@@ -204,8 +204,8 @@ MobileDefects::computeQpJacobian()
   Real jac_sum = 0.0;
   int cur_size;//should be positive value
   if(_cur_size>0){//v type
-    
-    cur_size = _cur_size; 
+
+    cur_size = _cur_size;
 
     //vi reaction loss(-)
     for(int i=1;i<=_number_i;i++){
@@ -219,16 +219,16 @@ MobileDefects::computeQpJacobian()
     if(cur_size*2<=_number_v)//2*u^2->4*u*phi
       jac_sum += 3.0*_u[_qp]*_gc._absorb(cur_size,cur_size);
 //(*_val_v_vars[cur_size-1])[_qp]
-  
+
     //v emission loss(-)
     jac_sum += _gc._emit(cur_size);
-    
+
     //dislocation loss(-)
     jac_sum += _gc._disl(cur_size);
   }
 
   else{//i type
-   
+
     cur_size = -_cur_size;//make it positive
 
     //iv reaction loss(-)
@@ -242,19 +242,21 @@ MobileDefects::computeQpJacobian()
     }
     if(cur_size*2<=_number_i)
       jac_sum += 3.0*_u[_qp]*_gc._absorb(-cur_size,-cur_size);// *(*_val_i_vars[cur_size-1])[_qp]
-  
+
     //i emission loss(-)
     jac_sum += _gc._emit(-cur_size);
-    
+
     //dislocation loss(-)
     jac_sum += _gc._disl(-cur_size);
   }
   return jac_sum*_test[_i][_qp] * _phi[_j][_qp];
 }
 
-Real 
-MobileDefects::computeQpOffDiagJacobian(unsigned int jvar){
-      return 0.0;//not provided now
+Real
+MobileDefects::computeQpOffDiagJacobian(unsigned int /*jvar*/)
+{
+  // not provided now
+  return 0.0;
 }
 
 

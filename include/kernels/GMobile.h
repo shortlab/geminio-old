@@ -15,41 +15,28 @@
 #ifndef GMOBILE_H
 #define GMOBILE_H
 
-#include "Kernel.h"
+#include "GBase.h"
 #include "GGroup.h"
 
 //Forward Declarations
 class GMobile;
 
-
 template<>
 InputParameters validParams<GMobile>();
 
-class GMobile : public Kernel
+class GMobile : public GBase
 {
 public:
-  
-  GMobile(const 
-                            InputParameters & parameters);
-  
+  GMobile(const InputParameters & parameters);
+
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
-  virtual Real computeQpOffDiagJacobian(unsigned int jvar);
-  int getGroupNumber(std::string);
   double getConcBySize(int i);
 
-private:
-  int _number_v;
-  int _number_i;
-  int _max_mobile_v; 
-  int _max_mobile_i; 
-  const GGroup & _gc;
-  std::vector<unsigned int> _no_v_vars;
-  std::vector<const VariableValue *> _val_v_vars;
-  std::vector<unsigned int> _no_i_vars;
-  std::vector<const VariableValue *> _val_i_vars;
-  int _cur_size;
-  int max_v,max_i;
+protected:
+  int _max_v;
+  int _max_i;
 };
-#endif 
+
+#endif // GMOBILE_H

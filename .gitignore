@@ -28,3 +28,12 @@
 *.exe
 *.out
 *.app
+
+include/base/GeminioRevision.h
+build
+lib
+.clang-format
+Geminio-opt
+Geminio-oprof
+Geminio-dbg
+Geminio-devel

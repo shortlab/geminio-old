@@ -23,20 +23,17 @@ class MaterialConstants : public GeneralUserObject
 public:
   MaterialConstants(const InputParameters & parameters);
 
-  virtual ~MaterialConstants(){}
   virtual void initialize();
   virtual void execute();
   virtual void finalize();
 
-  virtual Real absorb(int,int,std::string,std::string,double,int,int) const;
-  virtual Real emit(int,int,double,std::string,std::string,int,int) const;
-  virtual Real disl_ksq(int,std::string,double,int=1) const;//1 denotes mobile
-  virtual Real diff(int,std::string,double) const;
-
-private:
+  virtual Real absorb(int,int,std::string,std::string,Real,int,int) const;
+  virtual Real emit(int,int,Real,std::string,std::string,int,int) const;
+  virtual Real disl_ksq(int,std::string,Real,int=1) const;//1 denotes mobile
+  virtual Real diff(int,std::string,Real) const;
 };
 
 template<>
 InputParameters validParams<MaterialConstants>();
 
-#endif
+#endif // MATERIALCONSTANTS_H

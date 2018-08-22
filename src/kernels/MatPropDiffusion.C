@@ -18,16 +18,14 @@ template<>
 InputParameters validParams<MatPropDiffusion>()
 {
   InputParameters params = validParams<Diffusion>();
-  params.addRequiredParam<std::string>("diffusivity","The real material property (here is it a diffusivity) to use in this kernel");
+  params.addRequiredParam<std::string>("diffusivity", "The real material property (here is it a diffusivity) to use in this kernel");
   return params;
 }
 
-
-MatPropDiffusion::MatPropDiffusion(const
-                                   InputParameters & parameters)
-  :Diffusion(parameters),
-   _prop_name(getParam<std::string>("diffusivity")),
-   _D_species(getMaterialProperty<Real>(_prop_name))
+MatPropDiffusion::MatPropDiffusion(const InputParameters & parameters)
+  : Diffusion(parameters),
+    _prop_name(getParam<std::string>("diffusivity")),
+    _D_species(getMaterialProperty<Real>(_prop_name))
 {}
 
 Real

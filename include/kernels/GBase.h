@@ -12,27 +12,39 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef GIMMOBILEL1_H
-#define GIMMOBILEL1_H
+#ifndef GBASE_H
+#define GBASE_H
 
-#include "GBase.h"
+#include "Kernel.h"
 #include "GGroup.h"
 
 //Forward Declarations
-class GImmobileL1;
+class GBase;
 
 
 template<>
-InputParameters validParams<GImmobileL1>();
+InputParameters validParams<GBase>();
 
-class GImmobileL1 : public GBase
+class GBase : public Kernel
 {
 public:
-  GImmobileL1(const InputParameters & parameters);
+  GBase(const InputParameters & parameters);
 
 protected:
-  virtual Real computeQpResidual();
-  virtual Real computeQpJacobian();
+  virtual Real computeQpOffDiagJacobian(unsigned int /*jvar*/);
+  int getGroupNumber(std::string);
+
+protected:
+  unsigned int _number_v;
+  unsigned int _number_i;
+  int _max_mobile_v;
+  int _max_mobile_i;
+  const GGroup & _gc;
+  std::vector<unsigned int> _no_v_vars;
+  std::vector<const VariableValue *> _val_v_vars;
+  std::vector<unsigned int> _no_i_vars;
+  std::vector<const VariableValue *> _val_i_vars;
+  int _cur_size;
 };
 
-#endif // GIMMOBILEL1_H
+#endif // GBASE_H

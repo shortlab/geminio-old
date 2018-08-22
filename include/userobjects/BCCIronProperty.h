@@ -29,13 +29,13 @@ public:
   virtual void execute();
   virtual void finalize();
 
-  Real absorb(int,int,std::string,std::string,double,int,int) const;
-  Real emit(int,int,double,std::string,std::string,int,int) const;
-  Real disl_ksq(int,std::string,double,int=1) const;
-  double energy(int,std::string,std::string) const;
-  double D_prefactor(int,std::string) const;
-  double diff(int, std::string,double) const;
-  double Ebinding(double,const char*,double=1) const;
+  Real absorb(int,int,std::string,std::string,Real,int,int) const;
+  Real emit(int,int,Real,std::string,std::string,int,int) const;
+  Real disl_ksq(int,std::string,Real,int=1) const;
+  Real energy(int,std::string,std::string) const;
+  Real D_prefactor(int,std::string) const;
+  Real diff(int, std::string,Real) const;
+  Real Ebinding(Real,const char*,Real=1) const;
 
 private:
   Real _rho_d;

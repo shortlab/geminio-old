@@ -90,7 +90,7 @@ GroupConstant::~GroupConstant(){
         _emit_i_array = NULL;
         _absorb_ii_matrix = NULL;
     }
- */   
+ */
 }
 
 void
@@ -102,15 +102,15 @@ GroupConstant::initialize()
 /*
   int num_groups = GroupScheme_v.size();
   for(int i=0;i<num_groups;i++){
-      printf("group ID: %d; value: %d\n",i+1,GroupScheme_v[i]); 
+      printf("group ID: %d; value: %d\n",i+1,GroupScheme_v[i]);
   }
   num_groups = GroupScheme_i.size();
   for(int i=0;i<num_groups;i++){
-      printf("group ID: %d; value: %d\n",i+1,-GroupScheme_i[i]); 
+      printf("group ID: %d; value: %d\n",i+1,-GroupScheme_i[i]);
   }
 //print group constants
   for(SingleKey::const_iterator it=_emit_array.begin(); it!=_emit_array.end();it++){
-      printf("group: %d; emission: %10.8e\n",it->first,it->second); 
+      printf("group: %d; emission: %10.8e\n",it->first,it->second);
   }
   for(DoubleKey::const_iterator it=_absorb_matrix.begin();it!=_absorb_matrix.end();it++){
       printf("group1: %d; group2: %d; absorption: %10.8e\n",it->first.first,it->first.second,it->second);
@@ -168,9 +168,9 @@ GroupConstant::setGroupScheme(){//total _Ng group, _Ng+1 node
     }
   }
   else if(_GroupScheme=="Gaussian"){
-    if(_sigma<0) 
+    if(_sigma<0)
       mooseError("Gaussian Group Scheme setting not correct");
-    auto gauss = [](double x, double sigma){ return 1.0/sigma/std::sqrt(2.0*3.141592653589793)*std::exp(-x*x/(2.0*sigma*sigma));};
+    auto gauss = [](Real x, Real sigma){ return 1.0/sigma/std::sqrt(2.0*3.141592653589793)*std::exp(-x*x/(2.0*sigma*sigma));};
 //add vacancy group scheme
     if(_Ng_v>0){
         int single_v_group = _single_v_group+1;//1. 2. 3. each as a group, [1 2) [2 3) [3 4)
@@ -180,10 +180,10 @@ GroupConstant::setGroupScheme(){//total _Ng group, _Ng+1 node
         }
         if(_single_v_group<_Ng_v){
           int count = single_v_group;
-          double interval = 4.0*_sigma/(_Ng_v-_single_v_group);
-          double start = -2.0*_sigma;
-          double factor = 1.0/gauss(start,_sigma); 
-          double x = start;
+          Real interval = 4.0*_sigma/(_Ng_v-_single_v_group);
+          Real start = -2.0*_sigma;
+          Real factor = 1.0/gauss(start,_sigma);
+          Real x = start;
           int n_inc;
           for(int i=single_v_group+1;i<=_Ng_v+1;i++){
             int n_inc = (int)(_boosting_factor*std::max(1.0,factor*gauss(x,_sigma)));
@@ -193,7 +193,7 @@ GroupConstant::setGroupScheme(){//total _Ng group, _Ng+1 node
           }
         }
         printf("maximum v size: %d\n",GroupScheme_v.back());
-     
+
     }
 //append intersitial group scheme
     if(_Ng_i>0){
@@ -204,10 +204,10 @@ GroupConstant::setGroupScheme(){//total _Ng group, _Ng+1 node
         }
         if(_single_i_group<_Ng_i){
           int count = single_i_group;
-          double interval = 4.0*_sigma/(_Ng_i-_single_i_group);
-          double start = -2.0*_sigma;
-          double factor = 1.0/gauss(start,_sigma); 
-          double x = start;
+          Real interval = 4.0*_sigma/(_Ng_i-_single_i_group);
+          Real start = -2.0*_sigma;
+          Real factor = 1.0/gauss(start,_sigma);
+          Real x = start;
           int n_inc;
           for(int i=single_i_group+1;i<=_Ng_i+1;i++){
             n_inc = (int)(_boosting_factor*std::max(1.0,factor*gauss(x,_sigma)));
@@ -217,11 +217,11 @@ GroupConstant::setGroupScheme(){//total _Ng group, _Ng+1 node
           }
         }
         printf("maximum i size: %d\n",GroupScheme_i.back());
-      } 
+      }
   }
   else
     mooseError("Group shceme: ", _GroupScheme, " not correct");
-  
+
 
 }
 
@@ -243,7 +243,7 @@ GroupConstant::setGroupConstant(){
   for(int i=1;i<=_Ng_i;i++)
     _emit_array.insert(std::make_pair(-i,emit_gc(GroupScheme_i[i-1],GroupScheme_i[i])));
 
-  
+
   int total_mobile_v =(int)_v_size.size();
   int total_mobile_i =(int)_i_size.size();
 
@@ -302,15 +302,15 @@ GroupConstant::emit_gc(int cr_start, int cr_end) //[cr_start,cr_end)
 {
   int pos_start = abs(cr_start);
   int pos_end = abs(cr_end);
-  
+
   //std::cout<< "max long int: " << std::numeric_limits<long int>::max() << std::endl;
-  
+
   int multiply = ((cr_start>0)&&(cr_end>0)) || ((cr_start<0)&&(cr_end<0));
   if(!(pos_start<pos_end) || multiply <= 0){
       //printf("what %d %d %d %d %d\n", cr_start,cr_end,pos_start,pos_end,multiply);
       mooseError("Wrong interval terminal point in emit_gc function");
   }
-  
+
   const char* species = (cr_start>0)?"V":"I";
   int tagi = 0;//denote mobility
   Real sum = 0.0;
@@ -337,11 +337,11 @@ GroupConstant::disl_gc(int cr_start, int cr_end) //[cr_start,cr_end)
 {
   int pos_start = abs(cr_start);
   int pos_end = abs(cr_end);
-  //double multiply = (double)cr_start * (double)cr_end;
+  //Real multiply = (Real)cr_start * (Real)cr_end;
   int multiply = ((cr_start>0)&&(cr_end>0)) || ((cr_start<0)&&(cr_end<0));
   if(!(pos_start<pos_end) || multiply <= 0)
       mooseError("Wrong interval terminal point in disl_gc function");
-  
+
   const char* species = (cr_start>0)?"V":"I";
   int tagi = 0;//denote mobility
   Real sum = 0.0;
@@ -367,11 +367,11 @@ GroupConstant::diff_gc(int cr_start, int cr_end) //[cr_start,cr_end)
 {
   int pos_start = abs(cr_start);
   int pos_end = abs(cr_end);
-  //double multiply = (double)cr_start * (double)cr_end;
+  //Real multiply = (Real)cr_start * (Real)cr_end;
   int multiply = ((cr_start>0)&&(cr_end>0)) || ((cr_start<0)&&(cr_end<0));
   if(!(pos_start<pos_end) || multiply <= 0)
       mooseError("Wrong interval terminal point in diff_gc function");
-  
+
   const char* species = (cr_start>0)?"V":"I";
   int tagi = 0;//denote mobility
   Real sum = 0.0;
@@ -405,9 +405,9 @@ GroupConstant::absorb_gc(int ot_start, int ot_end, int cr_start, int cr_end) //[
   if(pos_cr_end != pos_cr_start+1)
       mooseError("Wrong interval terminal point in absorb_gc mobile range");
 
-  if(!(pos_ot_start<pos_ot_end) || !(pos_cr_start<pos_cr_end) || (double)ot_start*(double)ot_end<=0 || (double)cr_start*(double)cr_end<=0)
+  if(!(pos_ot_start<pos_ot_end) || !(pos_cr_start<pos_cr_end) || (Real)ot_start*(Real)ot_end<=0 || (Real)cr_start*(Real)cr_end<=0)
       mooseError("Wrong interval terminal point in absorb_gc function");
-   
+
   Real sum = 0.0;
   Real counter = 0.0;
   int tagi = 0,tagj = 0;//denote mobility: 0, imobile, 1, mobile
@@ -497,7 +497,7 @@ Real
 GroupConstant::_emit(int groupid) const //[cr_start,cr_end)
 {
     SingleKey::const_iterator it = _emit_array.find(groupid);
-    if(it != _emit_array.end()) 
+    if(it != _emit_array.end())
         return it->second;
     return 0.0;
 }
@@ -506,7 +506,7 @@ Real
 GroupConstant::_disl(int groupid) const //[cr_start,cr_end)
 {
     SingleKey::const_iterator it = _disl_array.find(groupid);
-    if(it != _disl_array.end()) 
+    if(it != _disl_array.end())
         return it->second;
     return 0.0;
 }
@@ -515,7 +515,7 @@ Real
 GroupConstant::_diff(int groupid) const //[cr_start,cr_end)
 {
     SingleKey::const_iterator it = _diff_array.find(groupid);
-    if(it != _diff_array.end()) 
+    if(it != _diff_array.end())
         return it->second;
     return 0.0;
 }
@@ -525,13 +525,11 @@ GroupConstant::_absorb(int groupid1, int groupid2) const //[ot_start,ot_end),[cr
 {
     DoubleKey::const_iterator it = _absorb_matrix.find(std::make_pair(groupid1,groupid2));
     if(it != _absorb_matrix.end())
-        return it->second;//_absorb_matrix[std::make_pair(groupid1,groupid2)]; 
+        return it->second;//_absorb_matrix[std::make_pair(groupid1,groupid2)];
     it = _absorb_matrix.find(std::make_pair(groupid2,groupid1));
     if(it != _absorb_matrix.end())
-        return it->second;//_absorb_matrix[std::make_pair(groupid2,groupid1)]; 
+        return it->second;//_absorb_matrix[std::make_pair(groupid2,groupid1)];
 
     printf("Absorption constant not found and return 0: %d vs %d\n",groupid1,groupid2);
     return 0.0;
 }
-
-

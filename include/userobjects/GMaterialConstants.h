@@ -16,25 +16,16 @@
 #ifndef GMATERIALCONSTANTS_H
 #define GMATERIALCONSTANTS_H
 
-#include "GeneralUserObject.h"
+#include "MaterialConstants.h"
 
-class GMaterialConstants : public GeneralUserObject
+class GMaterialConstants : public MaterialConstants
 {
 public:
   GMaterialConstants(const InputParameters & parameters);
 
-  virtual ~GMaterialConstants(){}
-  virtual void initialize();
-  virtual void execute();
-  virtual void finalize();
-
-  virtual Real absorb(int,int,std::string,std::string,double,int,int) const;
-  virtual Real absorbVV(int,int,int,double) const;
-  virtual Real absorbVI(int,int,int,double) const;
-  virtual Real absorbII(int,int,int,double) const;
-  virtual Real emit(int,int,double,std::string,std::string,int,int) const;
-  virtual Real disl_ksq(int,std::string,double,int=1) const;//1 denotes mobile
-  virtual Real diff(int,std::string,double) const;
+  virtual Real absorbVV(int,int,int,Real) const;
+  virtual Real absorbVI(int,int,int,Real) const;
+  virtual Real absorbII(int,int,int,Real) const;
   Real atomic_vol;
 
 protected:
@@ -46,4 +37,4 @@ protected:
 template<>
 InputParameters validParams<GMaterialConstants>();
 
-#endif
+#endif // GMATERIALCONSTANTS_H

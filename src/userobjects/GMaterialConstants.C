@@ -19,74 +19,38 @@
 template<>
 InputParameters validParams<GMaterialConstants>()
 {
-  InputParameters params = validParams<GeneralUserObject>();
+  InputParameters params = validParams<MaterialConstants>();
   params.addParam<Real>("dislocation",0.0,"dislocation density in #/um^2");
   params.addParam<Real>("i_disl_bias",1.1,"dislocation bias for intersitials");
   params.addParam<Real>("v_disl_bias",1.0,"dislocation bias for vacancies");
   params.addParam<Real>("atomic_vol",0.0,"atomic volume");
-  params.addClassDescription( "Object prototype to calculate material constants");
+  params.addClassDescription("Object prototype to calculate material constants");
   return params;
 }
 
 GMaterialConstants::GMaterialConstants(const InputParameters & parameters)
-: GeneralUserObject(parameters),
-  atomic_vol(getParam<Real>("atomic_vol")),
-  _rho_d(getParam<Real>("dislocation")),
-  _i_bias(getParam<Real>("i_disl_bias")),
-  _v_bias(getParam<Real>("v_disl_bias"))
+  : MaterialConstants(parameters),
+    atomic_vol(getParam<Real>("atomic_vol")),
+    _rho_d(getParam<Real>("dislocation")),
+    _i_bias(getParam<Real>("i_disl_bias")),
+    _v_bias(getParam<Real>("v_disl_bias"))
 {
 }
 
-void GMaterialConstants::initialize()
+Real GMaterialConstants::absorbVV(int /*a*/, int /*b*/, int /*dd*/, Real /*e*/) const
 {
+  // need overwrite
+  return 0.0;
 }
 
-void GMaterialConstants::execute()
+Real GMaterialConstants::absorbVI(int /*a*/, int /*b*/, int /*dd*/, Real /*e*/) const
 {
+  // need overwrite
+  return 0.0;
 }
 
-void GMaterialConstants::finalize()
+Real GMaterialConstants::absorbII(int /*a*/, int /*b*/, int /*dd*/, Real /*e*/) const
 {
-}
-
-Real GMaterialConstants::absorb(int a,int b,std::string str1,std::string str2,double cc,int dd,int e) const{
-
-return 0;//need overwrite
-
-}
-
-Real GMaterialConstants::absorbVV(int a,int b,int dd,double e) const{
-
-return 0;//need overwrite
-
-}
-
-Real GMaterialConstants::absorbVI(int a,int b,int dd,double e) const{
-
-return 0;//need overwrite
-
-}
-
-Real GMaterialConstants::absorbII(int a,int b,int dd,double e) const{
-
-return 0;//need overwrite
-
-}
-
-Real GMaterialConstants::emit(int a,int b,double c,std::string str1,std::string str2,int cc,int d) const{
-
-return 0;//need overwrite
-
-}
-
-Real GMaterialConstants::disl_ksq(int a,std::string str1,double cc,int d) const{
-
-return 0;//need overwrite
-
-}
-
-Real GMaterialConstants::diff(int a,std::string str1,double cc) const{
-
-return 0;//need overwrite
-
+  // need overwrite
+  return 0.0;
 }
