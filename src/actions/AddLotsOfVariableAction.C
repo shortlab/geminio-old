@@ -42,8 +42,8 @@ InputParameters validParams<AddLotsOfVariableAction>()
   MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
 
   InputParameters params = validParams<AddVariableAction>();
-  params.addRequiredParam<int>("number_v", "The number of vacancy variables to add");
-  params.addRequiredParam<int>("number_i", "The number of interstitial variables to add");
+  params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
+  params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   params.addParam<MooseEnum>("family", families, "Specifies the family of FE shape functions to use for this variable");
   params.addParam<MooseEnum>("order", orders,  "Specifies the order of the FE shape function to use for this variable");
   params.addParam<Real>("initial_condition", 0.0, "Specifies the initial condition for this variable");
@@ -65,10 +65,10 @@ AddLotsOfVariableAction::AddLotsOfVariableAction(const InputParameters & params)
 void
 AddLotsOfVariableAction::act()
 {
-  int number_v = getParam<int>("number_v");
-  int number_i = getParam<int>("number_i");
-  bool use_constIC = getParam<bool>("use_constIC");
-  std::string _bc_type = getParam<std::string>("bc_type");
+  const auto number_v = getParam<unsigned int>("number_v");
+  const auto number_i = getParam<unsigned int>("number_i");
+  const auto use_constIC = getParam<bool>("use_constIC");
+  const auto _bc_type = getParam<std::string>("bc_type");
 
   if (_current_task == "add_variable")
   {
@@ -84,15 +84,19 @@ AddLotsOfVariableAction::act()
     }
   }
 
-  else if(_current_task == "add_bc")
+  else if (_current_task == "add_bc")
   {
     Real bc_val = getParam<Real>("boundary_value");
+
     std::string bc_name;
-    if(_bc_type == "dirichlet") bc_name = "DirichletBC";
-    else if(_bc_type == "neumann") bc_name = "NeumannBC";
-    else 
+    if (_bc_type == "dirichlet")
+      bc_name = "DirichletBC";
+    else if (_bc_type == "neumann")
+      bc_name = "NeumannBC";
+    else
         mooseError("This bc name: ", bc_name, " does not exist");
-    for (int cur_num = 1; cur_num <= (number_v+number_i); cur_num++)
+
+    for (unsigned int cur_num = 1; cur_num <= (number_v+number_i); cur_num++)
     {
       std::string var_name;
       if (cur_num <= number_v)
@@ -119,21 +123,21 @@ AddLotsOfVariableAction::act()
     Real initial = getParam<Real>("initial_condition");
     if (initial > _abs_zero_tol || initial < -_abs_zero_tol)
     {
-        for (int cur_num = 1; cur_num <= (number_v+number_i); cur_num++)
-        {
-          std::string var_name;
-          if (cur_num <= number_v)
-            var_name = name() +"v"+ Moose::stringify(cur_num);
-          else
-            var_name = name() +"i"+ Moose::stringify(cur_num-number_v);
-          if(!_scalar_var){//for non-scalar variable, scalasr variable should use ScalarConstantIC
-              InputParameters params = _factory.getValidParams("ConstantIC");
-              params.set<VariableName>("variable") = var_name;
-              params.set<Real>("value") = initial;
-              _problem->addBoundaryCondition("ConstantIC", var_name + "_ic", params);
-          }
-        }  
-    }  
+      for (int cur_num = 1; cur_num <= (number_v+number_i); cur_num++)
+      {
+        std::string var_name;
+        if (cur_num <= number_v)
+          var_name = name() +"v"+ Moose::stringify(cur_num);
+        else
+          var_name = name() +"i"+ Moose::stringify(cur_num-number_v);
+        if (!_scalar_var){//for non-scalar variable, scalar variable should use ScalarConstantIC
+          InputParameters params = _factory.getValidParams("ConstantIC");
+          params.set<VariableName>("variable") = var_name;
+          params.set<Real>("value") = initial;
+          _problem->addBoundaryCondition("ConstantIC", var_name + "_ic", params);
+        }
+      }
+    }
   }
 
 }

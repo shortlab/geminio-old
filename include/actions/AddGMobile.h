@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddGMobile_H
+#endif // ADDGMOBILE_H

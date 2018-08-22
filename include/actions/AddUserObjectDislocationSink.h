@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddUserObjectDislocationSink_H
+#endif // ADDUSEROBJECTDISLOCATIONSINK_H

@@ -33,7 +33,6 @@
 #include "libmesh/explicit_system.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/fe.h"
-static int counter = 0;
 
 template<>
 InputParameters validParams<AddImmobileDefects>()
@@ -42,14 +41,13 @@ InputParameters validParams<AddImmobileDefects>()
   MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
 
   InputParameters params = validParams<AddVariableAction>();
-  params.addRequiredParam<int>("number_v", "The number of vacancy variables to add");
-  params.addRequiredParam<int>("number_i", "The number of interstitial variables to add");
-  params.addRequiredParam<int>("max_mobile_v", "maximum size of mobile vacancy cluster");
-  params.addRequiredParam<int>("max_mobile_i", "maximum size of mobile intersitial cluster");
+  params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
+  params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
+  params.addRequiredParam<unsigned int>("max_mobile_v", "maximum size of mobile vacancy cluster");
+  params.addRequiredParam<unsigned int>("max_mobile_i", "maximum size of mobile intersitial cluster");
   params.addRequiredParam<std::string>("group_constant", "user object name");
   return params;
 }
-
 
 AddImmobileDefects::AddImmobileDefects(const InputParameters & params) :
     AddVariableAction(params)
@@ -59,104 +57,116 @@ AddImmobileDefects::AddImmobileDefects(const InputParameters & params) :
 void
 AddImmobileDefects::act()
 {
-  int number_v = getParam<int>("number_v");
-  int number_i = getParam<int>("number_i");
-  int max_mobile_v = getParam<int>("max_mobile_v");
-  int max_mobile_i = getParam<int>("max_mobile_i");
-  
-  std::vector<int> v_mobile,i_mobile;
-  for(int i=0;i<max_mobile_v;i++)
+  const auto number_v = getParam<unsigned int>("number_v");
+  const auto number_i = getParam<unsigned int>("number_i");
+  const auto max_mobile_v = getParam<unsigned int>("max_mobile_v");
+  const auto max_mobile_i = getParam<unsigned int>("max_mobile_i");
+
+  std::vector<unsigned int> v_mobile,i_mobile;
+  for (unsigned int i = 0; i < max_mobile_v; ++i)
     v_mobile.push_back(i+1);
-  for(int i=0;i<max_mobile_i;i++)
+  for (unsigned int i = 0; i < max_mobile_i; ++i)
     i_mobile.push_back(i+1);
 
   std::string uo = getParam<std::string>("group_constant");
 
-  int v_size = v_mobile.size();
-  int i_size = i_mobile.size();
+  const unsigned int v_size = v_mobile.size();
+  const unsigned int i_size = i_mobile.size();
   std::string _prefix = name();
   std::string var_name;
 
-//first add immobile v
-  for(int cur_size=v_size+1; cur_size<=number_v; cur_size++){
+  // first add immobile v
+  for (unsigned int cur_size = v_size + 1; cur_size <= number_v; ++cur_size)
+  {
     std::string var_name_v = name() +"v"+ Moose::stringify(cur_size);
     InputParameters params = _factory.getValidParams("ImmobileDefects");
     params.set<NonlinearVariableName>("variable") = var_name_v;
 
     std::vector<VariableName> coupled_v_vars;
     std::vector<VariableName> coupled_i_vars;
-    for(int i=0;i<v_size;i++){
+    for (unsigned int i = 0; i < v_size; ++i)
+    {
       var_name = _prefix + "v" + Moose::stringify(v_mobile[i]);
       coupled_v_vars.push_back(var_name);
     }
-    for(int i=0;i<i_size;i++){
+    for (unsigned int i = 0; i < i_size; ++i)
+    {
       var_name = _prefix + "i" + Moose::stringify(i_mobile[i]);
       coupled_i_vars.push_back(var_name);
     }
-    for(int i=0;i<v_size;i++){//for vv reaction gain(+)
-      var_name = _prefix + "v" + Moose::stringify(cur_size-v_mobile[i]);
+    for (unsigned int i = 0; i < v_size; ++i)
+    {
+      //for vv reaction gain(+)
+      var_name = _prefix + "v" + Moose::stringify(cur_size - v_mobile[i]);
       coupled_v_vars.push_back(var_name);
     }
-    for(int i=0;i<std::min(i_size,number_v-cur_size);i++){//for vi reaction gain(+)
-      var_name = _prefix + "v" + Moose::stringify(cur_size+i_mobile[i]);
+    for (unsigned int i = 0; i < std::min(i_size, number_v - cur_size); ++i)
+    {
+      //for vi reaction gain(+)
+      var_name = _prefix + "v" + Moose::stringify(cur_size + i_mobile[i]);
       coupled_v_vars.push_back(var_name);
-    } 
-    if(i_size==0 && cur_size!=number_v){
+    }
+    if (i_size==0 && cur_size!=number_v)
+    {
       var_name = _prefix + "v" + Moose::stringify(cur_size+1);
       coupled_v_vars.push_back(var_name);
-    } 
+    }
 
     params.set<std::vector<VariableName> > ("coupled_v_vars") = coupled_v_vars;
     params.set<std::vector<VariableName> > ("coupled_i_vars") = coupled_i_vars;
     params.set<UserObjectName>("user_object") = uo;
-    params.set<int>("number_v") = number_v;
-    params.set<int>("number_i") = number_i;
-    params.set<std::vector<int> >("mobile_v_size") = v_mobile;
-    params.set<std::vector<int> >("mobile_i_size") = i_mobile;
-    _problem->addKernel("ImmobileDefects", "ImmobileDefects_" + var_name_v+ "_" + Moose::stringify(counter), params);
-//    printf("add ImmobileDefects: %s \n",var_name_v.c_str());
-    counter++;
+    params.set<unsigned int>("number_v") = number_v;
+    params.set<unsigned int>("number_i") = number_i;
+    params.set<std::vector<unsigned int> >("mobile_v_size") = v_mobile;
+    params.set<std::vector<unsigned int> >("mobile_i_size") = i_mobile;
+    _problem->addKernel("ImmobileDefects", "ImmobileDefects_" + var_name_v, params);
+    // printf("add ImmobileDefects: %s \n",var_name_v.c_str());
   }
-      
-//Second add immobile i
-  for(int cur_size=i_size+1; cur_size<=number_i; cur_size++){
-    std::string var_name_i = name() +"i"+ Moose::stringify(cur_size);
+
+  // second add immobile i
+  for (unsigned int cur_size = i_size + 1; cur_size <= number_i; ++cur_size)
+  {
+    std::string var_name_i = name() + "i" + Moose::stringify(cur_size);
     InputParameters params = _factory.getValidParams("ImmobileDefects");
     params.set<NonlinearVariableName>("variable") = var_name_i;
 
 
     std::vector<VariableName> coupled_v_vars;
     std::vector<VariableName> coupled_i_vars;
-    for(int i=0;i<v_size;i++){
+    for (unsigned int i = 0; i < v_size; ++i)
+    {
       var_name = _prefix + "v" + Moose::stringify(v_mobile[i]);
       coupled_v_vars.push_back(var_name);
     }
-    for(int i=0;i<i_size;i++){
+    for (unsigned int i = 0; i < i_size; ++i)
+    {
       var_name = _prefix + "i" + Moose::stringify(i_mobile[i]);
       coupled_i_vars.push_back(var_name);
     }
-    for(int i=0;i<i_size;i++){
+    for (unsigned int i = 0; i < i_size; ++i)
+    {
       var_name = _prefix + "i" + Moose::stringify(cur_size-i_mobile[i]);
       coupled_i_vars.push_back(var_name);
     }
-    for(int i=0;i<std::min(v_size,number_i-cur_size);i++){
+    for (unsigned int i = 0; i < std::min(v_size,number_i-cur_size); ++i)
+    {
       var_name = _prefix + "i" + Moose::stringify(cur_size+v_mobile[i]);
       coupled_i_vars.push_back(var_name);
-    } 
-    if(v_size==0 && cur_size!=number_i){
-      var_name = _prefix + "i" + Moose::stringify(cur_size+1);
+    }
+    if (v_size == 0 && cur_size != number_i)
+    {
+      var_name = _prefix + "i" + Moose::stringify(cur_size + 1);
       coupled_i_vars.push_back(var_name);
-    } 
+    }
 
     params.set<std::vector<VariableName> > ("coupled_v_vars") = coupled_v_vars;
     params.set<std::vector<VariableName> > ("coupled_i_vars") = coupled_i_vars;
     params.set<UserObjectName>("user_object") = uo;
-    params.set<int>("number_v") = number_v;
-    params.set<int>("number_i") = number_i;
-    params.set<std::vector<int> >("mobile_v_size") = v_mobile;
-    params.set<std::vector<int> >("mobile_i_size") = i_mobile;
-    _problem->addKernel("ImmobileDefects", "ImmobileDefects_" + var_name_i+ "_" + Moose::stringify(counter), params);
-//    printf("add ImmobileDefects: %s \n",var_name_i.c_str());
-    counter++;
+    params.set<unsigned int>("number_v") = number_v;
+    params.set<unsigned int>("number_i") = number_i;
+    params.set<std::vector<unsigned int> >("mobile_v_size") = v_mobile;
+    params.set<std::vector<unsigned int> >("mobile_i_size") = i_mobile;
+    _problem->addKernel("ImmobileDefects", "ImmobileDefects_" + var_name_i, params);
+    // printf("add ImmobileDefects: %s \n",var_name_i.c_str());
   }
 }

@@ -40,22 +40,22 @@ InputParameters validParams<AddGVoidSwelling>()
   MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
 
   InputParameters params = validParams<AddVariableAction>();
-  params.addRequiredParam<int>("number_v", "The number of vacancy variables to add");
+  params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<std::string>("aux_var","aux variable name to hold value");
   params.addRequiredParam<std::string>("group_constant", "user object name");
   return params;
 }
 
-
 AddGVoidSwelling::AddGVoidSwelling(const InputParameters & params) :
     AddVariableAction(params)
 {
 }
-//only emission of point defects of same type are considered
+
+// only emission of point defects of same type are considered
 void
 AddGVoidSwelling::act()
 {
-  int number_v = getParam<int>("number_v");
+  const auto number_v = getParam<unsigned int>("number_v");
 
   std::string aux_var = getParam<std::string>("aux_var");
   std::string uo = getParam<std::string>("group_constant");
@@ -78,4 +78,3 @@ AddGVoidSwelling::act()
   params.set<UserObjectName>("user_object") = uo;
   _problem->addAuxKernel("GVoidSwelling", "GVoidSwelling_" + aux_var, params);
 }
-      

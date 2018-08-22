@@ -42,11 +42,10 @@ InputParameters validParams<AddClusterDensity>()
   InputParameters params = validParams<AddVariableAction>();
   params.addRequiredParam<std::string>("aux_var","aux variable name to hold value");
   params.addRequiredParam<std::string>("var_prefix","The prefix string of variables (in front of number)");
-  params.addRequiredParam<std::vector<int> >("size_range","The number of vacancy variables to solve");
+  params.addRequiredParam<std::vector<unsigned int>>("size_range", "The number of vacancy variables to solve");
   params.addParam<Real>("scale_factor", 1.0, "A scale factor to be applied to the variable");
   return params;
 }
-
 
 AddClusterDensity::AddClusterDensity(const InputParameters & params) :
     AddVariableAction(params)
@@ -56,17 +55,17 @@ AddClusterDensity::AddClusterDensity(const InputParameters & params) :
 void
 AddClusterDensity::act()
 {
-
   std::string aux_var = getParam<std::string>("aux_var");
   std::string  _var_prefix = getParam<std::string>("var_prefix");
-  std::vector<int>  _size_range = getParam<std::vector<int> >("size_range");
-  Real _scale_factor = getParam<Real>("scale_factor");
+  std::vector<unsigned int> _size_range = getParam<std::vector<unsigned int> >("size_range");
+  const auto _scale_factor = getParam<Real>("scale_factor");
   std::vector<VariableName> coupled_vars;
 
   std::string var_name;
-  for(int i=_size_range[0];i<=_size_range[1];i++){
-      std::string var_name = _var_prefix + Moose::stringify(i);
-      coupled_vars.push_back(var_name);
+  for (unsigned int i = _size_range[0]; i <= _size_range[1]; ++i)
+  {
+    std::string var_name = _var_prefix + Moose::stringify(i);
+    coupled_vars.push_back(var_name);
   }
 
   InputParameters params = _factory.getValidParams("ClusterDensity");
@@ -75,4 +74,3 @@ AddClusterDensity::act()
   params.set<Real>("scaling_factor") = _scale_factor;
   _problem->addAuxKernel("ClusterDensity", "ClusterDensity_" + aux_var, params);
 }
-      

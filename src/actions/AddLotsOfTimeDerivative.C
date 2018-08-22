@@ -33,7 +33,7 @@
 #include "libmesh/explicit_system.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/fe.h"
-static unsigned int counter = 0;
+
 template<>
 InputParameters validParams<AddLotsOfTimeDerivative>()
 {
@@ -54,25 +54,23 @@ AddLotsOfTimeDerivative::AddLotsOfTimeDerivative(const InputParameters & params)
 void
 AddLotsOfTimeDerivative::act()
 {
-  unsigned int number_v = getParam<unsigned int>("number_v");
-  unsigned int number_i = getParam<unsigned int>("number_i");
+  const auto number_v = getParam<unsigned int>("number_v");
+  const auto number_i = getParam<unsigned int>("number_i");
 
-  for (unsigned int cur_num = 1; cur_num <= number_v; cur_num++)
+  for (unsigned int cur_num = 1; cur_num <= number_v; ++cur_num)
   {
-    std::string var_name_v = name() +"v"+ Moose::stringify(cur_num);
+    std::string var_name_v = name() + "v" + Moose::stringify(cur_num);
     InputParameters params = _factory.getValidParams("TimeDerivative");
     params.set<NonlinearVariableName>("variable") = var_name_v;
-    _problem->addKernel("TimeDerivative","dt_"+ var_name_v+Moose::stringify(counter), params);
-   // printf("add TimeDerivative: %s\n",var_name_v.c_str());
-    counter++;
+    _problem->addKernel("TimeDerivative", "dt_v_" + var_name_v+Moose::stringify(cur_num), params);
+    // printf("add TimeDerivative: %s\n",var_name_v.c_str());
   }
   for (unsigned int cur_num = 1; cur_num <= number_i; cur_num++)
   {
-    std::string var_name_i = name() +"i"+ Moose::stringify(cur_num);
+    std::string var_name_i = name() + "i" + Moose::stringify(cur_num);
     InputParameters params = _factory.getValidParams("TimeDerivative");
     params.set<NonlinearVariableName>("variable") = var_name_i;
-    _problem->addKernel("TimeDerivative", "dt_"+ var_name_i+Moose::stringify(counter), params);
-    //printf("add TimeDerivative: %s\n",var_name_i.c_str());
-    counter++;
+    _problem->addKernel("TimeDerivative", "dt_i_"+ var_name_i + Moose::stringify(cur_num), params);
+    // printf("add TimeDerivative: %s\n",var_name_i.c_str());
   }
 }

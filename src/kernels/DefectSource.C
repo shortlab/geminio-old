@@ -37,13 +37,14 @@ DefectSource::DefectSource(const
 Real
 DefectSource::computeQpResidual()
 {
+  // Negative sign because positive source from weak form PDE
   return -_test[_i][_qp]
            * ((_coef * _intracascade_survival[_qp] * _primary_source[_qp])
-           + _secondary_source[_qp]); // Negative sign because positive source from weak form PDE
+           + _secondary_source[_qp]);
 }
 
 Real
 DefectSource::computeQpJacobian()
 {
-  return 0;
+  return 0.0;
 }

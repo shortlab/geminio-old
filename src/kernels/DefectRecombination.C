@@ -35,20 +35,23 @@ DefectRecombination::DefectRecombination(const
 Real
 DefectRecombination::computeQpResidual()
 {
-  return _test[_i][_qp] * _recombination_rate[_qp] * _other_defect[_qp] * _u[_qp]; // Positive sign because negative source from weak form PDE
+  // Positive sign because negative source from weak form PDE
+  return _test[_i][_qp] * _recombination_rate[_qp] * _other_defect[_qp] * _u[_qp];
 }
 
 Real
 DefectRecombination::computeQpJacobian()
 {
-  return _test[_i][_qp] * _recombination_rate[_qp] * _other_defect[_qp] * _phi[_j][_qp]; // Positive sign because negative source from weak form PDE
+  // Positive sign because negative source from weak form PDE
+  return _test[_i][_qp] * _recombination_rate[_qp] * _other_defect[_qp] * _phi[_j][_qp];
 }
 
 Real
 DefectRecombination::computeQpOffDiagJacobian(unsigned int jvar)
 {
+  // Positive sign because negative source from weak form PDE
   if (jvar == _other_defect_var)
-    return _test[_i][_qp] * _recombination_rate[_qp] * _phi[_j][_qp] * _u[_qp]; // Positive sign because negative source from weak form PDE
+    return _test[_i][_qp] * _recombination_rate[_qp] * _phi[_j][_qp] * _u[_qp];
 
-  return 0;
+  return 0.0;
 }

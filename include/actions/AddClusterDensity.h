@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddClusterDensity_H
+#endif // ADDCLUSTERDENSITY_H

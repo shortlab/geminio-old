@@ -32,7 +32,6 @@
 #include "libmesh/explicit_system.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/fe.h"
-static unsigned int counter = 0;
 
 template<>
 InputParameters validParams<AddGConstantKernels>()
@@ -41,13 +40,13 @@ InputParameters validParams<AddGConstantKernels>()
   MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
 
   InputParameters params = validParams<AddVariableAction>();
-  params.addParam<std::vector<int> >("source_v_size", "A vector of distribution of creation along ion range");
-  params.addParam<std::vector<int> >("source_i_size", "A vector of distribution of creation along ion range");
+  params.addParam<std::vector<unsigned int> >("source_v_size", "A vector of distribution of creation along ion range");
+  params.addParam<std::vector<unsigned int> >("source_i_size", "A vector of distribution of creation along ion range");
   params.addParam<std::vector<Real> >("source_v_value", "production of i clusters for source_i_size species");
   params.addParam<std::vector<Real> >("source_i_value", "production of v clusters for 1 source_v_size species");
   params.addParam<Real>("scaling_factor",1.0,"scaling factor to source rate");
-  params.addParam<int>("number_single_v",0,"largest cluster size using group size of 1");
-  params.addParam<int>("number_single_i",0,"largest cluster size using group size of 1");
+  params.addParam<unsigned int>("number_single_v", 0, "largest cluster size using group size of 1");
+  params.addParam<unsigned int>("number_single_i", 0, "largest cluster size using group size of 1");
   params.addParam<Real>("tlimit","set lifetime for the kernel");
   return params;
 }
@@ -61,41 +60,49 @@ AddGConstantKernels::AddGConstantKernels(const InputParameters & params) :
 void
 AddGConstantKernels::act()
 {
-  std::vector<int> v_size = getParam<std::vector<int> >("source_v_size");
-  std::vector<int> i_size = getParam<std::vector<int> >("source_i_size");
+  std::vector<unsigned int> v_size = getParam<std::vector<unsigned int> >("source_v_size");
+  std::vector<unsigned int> i_size = getParam<std::vector<unsigned int> >("source_i_size");
   std::vector<Real> vv = getParam<std::vector<Real> >("source_v_value");
   std::vector<Real> ii = getParam<std::vector<Real> >("source_i_value");
-  int max_single_v = getParam<int>("number_single_v");
-  int max_single_i = getParam<int>("number_single_i");
-  Real scaling_factor = getParam<Real>("scaling_factor");
+  const auto max_single_v = getParam<unsigned int>("number_single_v");
+  const auto max_single_i = getParam<unsigned int>("number_single_i");
+  const auto scaling_factor = getParam<Real>("scaling_factor");
 
-//ATTENTION: the emission of vacancy cluster emit an interstitial or interstitial cluster emit an vacancy is not considered
-  if((v_size.size() && *std::max_element(v_size.begin(),v_size.end()) > max_single_v) || (i_size.size() && *std::max_element(i_size.begin(),i_size.end()) > max_single_i))
+  //ATTENTION: the emission of vacancy cluster emit an interstitial or interstitial cluster emit an vacancy is not considered
+  if ((v_size.size() && *std::max_element(v_size.begin(),v_size.end()) > max_single_v) ||
+      (i_size.size() && *std::max_element(i_size.begin(),i_size.end()) > max_single_i))
     mooseError("Make sure number_single is larger than the largest source size");
-   
 
-  for (unsigned int cur_num = 1; cur_num <= v_size.size(); cur_num++)
+
+  for (unsigned int cur_num = 0; cur_num < v_size.size(); ++cur_num)
   {
-    std::string var_name_v = name() +"0v"+ Moose::stringify(v_size[cur_num-1]);
+    std::string var_name_v = name() + "0v" + Moose::stringify(v_size[cur_num]);
     InputParameters params = _factory.getValidParams("ConstantKernel");
     params.set<NonlinearVariableName>("variable") = var_name_v;
-    params.set<Real>("value") = vv[cur_num-1]*scaling_factor;//Should be the production term of current size, gain should be negative in the kernel
+
+    //Should be the production term of current size, gain should be negative in the kernel
+    params.set<Real>("value") = vv[cur_num] * scaling_factor;
+
     if (isParamValid("tlimit"))
       params.set<Real>("tlimit") = getParam<Real>("tlimit");
-    _problem->addKernel("ConstantKernel", "ConstantKernel_" +  var_name_v + Moose::stringify(counter), params);
-    printf("add Source: %s\n",var_name_v.c_str());
-    counter++;
+
+    _problem->addKernel("ConstantKernel", "ConstantKernel_" +  var_name_v + Moose::stringify(cur_num), params);
+    _console << "add Source: " << var_name_v << '\n';
   }
-  for (unsigned int cur_num = 1; cur_num <= i_size.size(); cur_num++)
+
+  for (unsigned int cur_num = 0; cur_num < i_size.size(); ++cur_num)
   {
-    std::string var_name_i = name() +"0i"+ Moose::stringify(i_size[cur_num-1]);
+    std::string var_name_i = name() + "0i" + Moose::stringify(i_size[cur_num]);
     InputParameters params = _factory.getValidParams("ConstantKernel");
     params.set<NonlinearVariableName>("variable") = var_name_i;
-    params.set<Real>("value") = ii[cur_num-1]*scaling_factor;// gain should be negative in the kernel
+
+    // gain should be negative in the kernel
+    params.set<Real>("value") = ii[cur_num] * scaling_factor;
+
     if (isParamValid("tlimit"))
       params.set<Real>("tlimit") = getParam<Real>("tlimit");
-    _problem->addKernel("ConstantKernel", "ConstantKernel_"+ var_name_i+ Moose::stringify(counter), params);
-    printf("add Source: %s\n",var_name_i.c_str());
-    counter++;
+
+    _problem->addKernel("ConstantKernel", "ConstantKernel_" + var_name_i + Moose::stringify(cur_num), params);
+    _console << "add Source: " << var_name_i << '\n';
   }
 }

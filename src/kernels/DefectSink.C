@@ -36,15 +36,17 @@ DefectSink::DefectSink(const
 Real
 DefectSink::computeQpResidual()
 {
-//  return _test[_i][_qp] * _sink_rate[_qp] * _sink_concentration[_qp] * (_u[_qp] - _sink_concentration_correction[_qp]); // Positive sign because negative source from weak form PDE
-  return _test[_i][_qp] * _sink_rate[_qp] * (_u[_qp] - _defect_concentration_correction[_qp]); // Positive sign because negative source from weak form PDE
+  // Positive sign because negative source from weak form PDE
+  // return _test[_i][_qp] * _sink_rate[_qp] * _sink_concentration[_qp] * (_u[_qp] - _sink_concentration_correction[_qp]);
+  return _test[_i][_qp] * _sink_rate[_qp] * (_u[_qp] - _defect_concentration_correction[_qp]);
 }
 
 Real
 DefectSink::computeQpJacobian()
 {
-//  return _test[_i][_qp] * _sink_rate[_qp] * _sink_concentration[_qp] * _phi[_j][_qp]; // Positive sign because negative source from weak form PDE
-  return _test[_i][_qp] * _sink_rate[_qp] * _phi[_j][_qp]; // Positive sign because negative source from weak form PDE
+  // Positive sign because negative source from weak form PDE
+  // return _test[_i][_qp] * _sink_rate[_qp] * _sink_concentration[_qp] * _phi[_j][_qp];
+  return _test[_i][_qp] * _sink_rate[_qp] * _phi[_j][_qp];
 }
 
 /*
