@@ -13,41 +13,21 @@
 /****************************************************************/
 
 #include "AddGTimeDerivative.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddVariableAction.h"
 #include "Conversion.h"
-#include "DirichletBC.h"
-#include "TimeDerivative.h"
-
-#include <sstream>
-#include <stdexcept>
-
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
 
 template<>
 InputParameters validParams<AddGTimeDerivative>()
 {
-  MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
-  MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
-
-  InputParameters params = validParams<AddVariableAction>();
+  InputParameters params = validParams<Action>();
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   return params;
 }
 
 AddGTimeDerivative::AddGTimeDerivative(const InputParameters & params) :
-    AddVariableAction(params)
+    Action(params)
 {
 }
 

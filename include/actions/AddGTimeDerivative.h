@@ -15,7 +15,7 @@
 #ifndef ADDGTIMEDERIVATIVE_H
 #define ADDGTIMEDERIVATIVE_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddGTimeDerivative;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddGTimeDerivative>();
 
 
-class AddGTimeDerivative : public AddVariableAction
+class AddGTimeDerivative : public Action
 {
 public:
   AddGTimeDerivative(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddGTimeDerivative_H
+#endif // ADDGTIMEDERIVATIVE_H

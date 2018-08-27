@@ -13,47 +13,29 @@
 /****************************************************************/
 
 #include "AddGConstantKernels.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddVariableAction.h"
 #include "Conversion.h"
-#include "ConstantKernel.h"
 
-#include <sstream>
-#include <stdexcept>
-
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
+registerMooseAction("GeminioApp", AddGConstantKernels, "add_kernel");
 
 template<>
 InputParameters validParams<AddGConstantKernels>()
 {
-  MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
-  MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
-
-  InputParameters params = validParams<AddVariableAction>();
+  InputParameters params = validParams<Action>();
   params.addParam<std::vector<unsigned int> >("source_v_size", "A vector of distribution of creation along ion range");
   params.addParam<std::vector<unsigned int> >("source_i_size", "A vector of distribution of creation along ion range");
   params.addParam<std::vector<Real> >("source_v_value", "production of i clusters for source_i_size species");
   params.addParam<std::vector<Real> >("source_i_value", "production of v clusters for 1 source_v_size species");
-  params.addParam<Real>("scaling_factor",1.0,"scaling factor to source rate");
+  params.addParam<Real>("scaling_factor", 1.0, "scaling factor to source rate");
   params.addParam<unsigned int>("number_single_v", 0, "largest cluster size using group size of 1");
   params.addParam<unsigned int>("number_single_i", 0, "largest cluster size using group size of 1");
-  params.addParam<Real>("tlimit","set lifetime for the kernel");
+  params.addParam<Real>("tlimit", "set lifetime for the kernel");
   return params;
 }
 
-
 AddGConstantKernels::AddGConstantKernels(const InputParameters & params) :
-    AddVariableAction(params)
+    Action(params)
 {
 }
 

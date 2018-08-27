@@ -15,7 +15,7 @@
 #ifndef ADDIMMOBILEDEFECTS_H
 #define ADDIMMOBILEDEFECTS_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddImmobileDefects;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddImmobileDefects>();
 
 
-class AddImmobileDefects : public AddVariableAction
+class AddImmobileDefects : public Action
 {
 public:
   AddImmobileDefects(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddImmobileDefects_H
+#endif // ADDIMMOBILEDEFECTS_H

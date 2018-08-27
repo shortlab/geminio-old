@@ -15,7 +15,7 @@
 #ifndef ADDLOTSOFTIMEDERIVATIVE_H
 #define ADDLOTSOFTIMEDERIVATIVE_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddLotsOfTimeDerivative;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddLotsOfTimeDerivative>();
 
 
-class AddLotsOfTimeDerivative : public AddVariableAction
+class AddLotsOfTimeDerivative : public Action
 {
 public:
   AddLotsOfTimeDerivative(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddLotsOfTimeDerivative_H
+#endif // ADDLOTSOFTIMEDERIVATIVE_H

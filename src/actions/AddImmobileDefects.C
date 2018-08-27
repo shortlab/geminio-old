@@ -13,44 +13,26 @@
 /****************************************************************/
 
 #include "AddImmobileDefects.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddVariableAction.h"
 #include "Conversion.h"
-#include "DirichletBC.h"
-#include "ImmobileDefects.h"
 
-#include <sstream>
-#include <stdexcept>
-#include <algorithm>
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
+registerMooseAction("GeminioApp", AddImmobileDefects, "add_kernel");
 
 template<>
 InputParameters validParams<AddImmobileDefects>()
 {
-  MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
-  MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
-
-  InputParameters params = validParams<AddVariableAction>();
+  InputParameters params = validParams<Action>();
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   params.addRequiredParam<unsigned int>("max_mobile_v", "maximum size of mobile vacancy cluster");
-  params.addRequiredParam<unsigned int>("max_mobile_i", "maximum size of mobile intersitial cluster");
-  params.addRequiredParam<std::string>("group_constant", "user object name");
+  params.addRequiredParam<unsigned int>("max_mobile_i", "maximum size of mobile interstitial cluster");
+  params.addRequiredParam<UserObjectName>("group_constant", "User object holding the grouping method parameterization");
   return params;
 }
 
 AddImmobileDefects::AddImmobileDefects(const InputParameters & params) :
-    AddVariableAction(params)
+    Action(params)
 {
 }
 //only emission of point defects of same type are considered
@@ -68,7 +50,7 @@ AddImmobileDefects::act()
   for (unsigned int i = 0; i < max_mobile_i; ++i)
     i_mobile.push_back(i+1);
 
-  std::string uo = getParam<std::string>("group_constant");
+  const auto group_constant_name = getParam<UserObjectName>("group_constant");
 
   const unsigned int v_size = v_mobile.size();
   const unsigned int i_size = i_mobile.size();
@@ -114,7 +96,7 @@ AddImmobileDefects::act()
 
     params.set<std::vector<VariableName> > ("coupled_v_vars") = coupled_v_vars;
     params.set<std::vector<VariableName> > ("coupled_i_vars") = coupled_i_vars;
-    params.set<UserObjectName>("user_object") = uo;
+    params.set<UserObjectName>("user_object") = group_constant_name;
     params.set<unsigned int>("number_v") = number_v;
     params.set<unsigned int>("number_i") = number_i;
     params.set<std::vector<unsigned int> >("mobile_v_size") = v_mobile;
@@ -161,7 +143,7 @@ AddImmobileDefects::act()
 
     params.set<std::vector<VariableName> > ("coupled_v_vars") = coupled_v_vars;
     params.set<std::vector<VariableName> > ("coupled_i_vars") = coupled_i_vars;
-    params.set<UserObjectName>("user_object") = uo;
+    params.set<UserObjectName>("user_object") = group_constant_name;
     params.set<unsigned int>("number_v") = number_v;
     params.set<unsigned int>("number_i") = number_i;
     params.set<std::vector<unsigned int> >("mobile_v_size") = v_mobile;

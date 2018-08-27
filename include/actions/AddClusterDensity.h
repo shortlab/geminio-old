@@ -15,7 +15,7 @@
 #ifndef ADDCLUSTERDENSITY_H
 #define ADDCLUSTERDENSITY_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddClusterDensity;
 
@@ -23,12 +23,15 @@ template<>
 InputParameters validParams<AddClusterDensity>();
 
 
-class AddClusterDensity : public AddVariableAction
+class AddClusterDensity : public Action
 {
 public:
   AddClusterDensity(const  InputParameters & parameters);
 
   virtual void act();
+
+protected:
+  std::vector<unsigned int> _size_range;
 };
 
 #endif // ADDCLUSTERDENSITY_H

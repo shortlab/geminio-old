@@ -15,7 +15,7 @@
 #ifndef ADDGVOIDSWELLING_H
 #define ADDGVOIDSWELLING_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddGVoidSwelling;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddGVoidSwelling>();
 
 
-class AddGVoidSwelling : public AddVariableAction
+class AddGVoidSwelling : public Action
 {
 public:
   AddGVoidSwelling(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddGVoidSwelling_H
+#endif // ADDGVOIDSWELLING_H

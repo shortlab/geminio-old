@@ -13,46 +13,28 @@
 /****************************************************************/
 
 #include "AddUserObjectSingleVariable.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddVariableAction.h"
 #include "Conversion.h"
-#include "DirichletBC.h"
-#include "UserObjectSingleVariable.h"
 
-#include <sstream>
-#include <stdexcept>
-#include <algorithm>
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
+registerMooseAction("GeminioApp", AddUserObjectSingleVariable, "add_kernel");
 
 template<>
 InputParameters validParams<AddUserObjectSingleVariable>()
 {
-  MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
-  MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
-
-  InputParameters params = validParams<AddVariableAction>();
+  InputParameters params = validParams<Action>();
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   params.addRequiredParam<std::vector<unsigned int> >("mobile_v_size", "A vector of mobile species");
   params.addRequiredParam<std::vector<unsigned int> >("mobile_i_size", "A vector of mobile species");
-  params.addRequiredParam<std::string>("group_constant", "user object name");
+  params.addRequiredParam<UserObjectName>("group_constant", "user object name");
   params.addRequiredParam<std::string>("call_function", "map to function to call in the userobject");
   params.addParam<Real>("temperature", 600.0, "Temperature");
   return params;
 }
 
 AddUserObjectSingleVariable::AddUserObjectSingleVariable(const InputParameters & params) :
-    AddVariableAction(params)
+    Action(params)
 {
 }
 
@@ -65,7 +47,7 @@ AddUserObjectSingleVariable::act()
   std::vector<unsigned int> v_size = getParam<std::vector<unsigned int> >("mobile_v_size");
   std::vector<unsigned int> i_size = getParam<std::vector<unsigned int> >("mobile_i_size");
   // const auto temp = getParam<Real>("temperature");
-  std::string uo = getParam<std::string>("group_constant");
+  std::string group_constant_name = getParam<UserObjectName>("group_constant");
   std::string call_function = getParam<std::string>("call_function");
 
   // vv emission
@@ -77,7 +59,7 @@ AddUserObjectSingleVariable::act()
     InputParameters params = _factory.getValidParams("UserObjectSingleVariable");
     params.set<NonlinearVariableName>("variable") = var_name_v;
     params.set<Real>("coeff") = emit_coef; // loss "+"
-    params.set<UserObjectName>("user_object") = uo;
+    params.set<UserObjectName>("user_object") = group_constant_name;
     params.set<std::string>("call_function") = call_function;
     _problem->addKernel("UserObjectSingleVariable", "UOSingleV_" + var_name_v, params);
     // printf("add UserObjectSingleVariable: %s (emit -), coef: %lf\n",var_name_v.c_str(),emit_coef);
@@ -87,7 +69,7 @@ AddUserObjectSingleVariable::act()
     InputParameters params0 = _factory.getValidParams("UserObjectSingleVariable");
     params0.set<NonlinearVariableName>("variable") = var_name_v2;
     params0.set<std::vector<VariableName> > ("secondVar").push_back(var_name_v);
-    params0.set<UserObjectName>("user_object") = uo;
+    params0.set<UserObjectName>("user_object") = group_constant_name;
     params0.set<std::string>("call_function") = call_function;
     emit_coef = -1.0;
     //emission coefficient from larger size to current size; gain should be negative in kernel
@@ -100,7 +82,7 @@ AddUserObjectSingleVariable::act()
     InputParameters params_other = _factory.getValidParams("UserObjectSingleVariable");
     params_other.set<NonlinearVariableName>("variable") = var_name_other;
     params_other.set<std::vector<VariableName> > ("secondVar").push_back(var_name_v);
-    params_other.set<UserObjectName>("user_object") = uo;
+    params_other.set<UserObjectName>("user_object") = group_constant_name;
     params_other.set<std::string>("call_function") = call_function;
     emit_coef = -1.0;
     // emission coefficient from larger size to current size; gain should be negative in kernel
@@ -118,7 +100,7 @@ AddUserObjectSingleVariable::act()
     InputParameters params = _factory.getValidParams("UserObjectSingleVariable");
     params.set<NonlinearVariableName>("variable") = var_name_i;
     params.set<Real>("coeff") = emit_coef; // loss "+"
-    params.set<UserObjectName>("user_object") = uo;
+    params.set<UserObjectName>("user_object") = group_constant_name;
     params.set<std::string>("call_function") = call_function;
     _problem->addKernel("UserObjectSingleVariable", "UOSingleV_" + var_name_i, params);
     // printf("add UserObjectSingleVariable: %s (emit -), coef: %lf\n",var_name_i.c_str(),emit_coef);
@@ -128,7 +110,7 @@ AddUserObjectSingleVariable::act()
     InputParameters params0 = _factory.getValidParams("UserObjectSingleVariable");
     params0.set<NonlinearVariableName>("variable") = var_name_i2;
     params0.set<std::vector<VariableName> > ("secondVar").push_back(var_name_i);
-    params0.set<UserObjectName>("user_object") = uo;
+    params0.set<UserObjectName>("user_object") = group_constant_name;
     params0.set<std::string>("call_function") = call_function;
     emit_coef = -1.0;
     // emission coefficient from larger size to current size; gain should be negative in kernel
@@ -141,7 +123,7 @@ AddUserObjectSingleVariable::act()
     InputParameters params_other = _factory.getValidParams("UserObjectSingleVariable");
     params_other.set<NonlinearVariableName>("variable") = var_name_other;
     params_other.set<std::vector<VariableName> > ("secondVar").push_back(var_name_i);
-    params_other.set<UserObjectName>("user_object") = uo;
+    params_other.set<UserObjectName>("user_object") = group_constant_name;
     params_other.set<std::string>("call_function") = call_function;
     emit_coef = -1.0;
     // emission coefficient from larger size to current size; gain should be negative in kernel

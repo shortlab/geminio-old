@@ -15,7 +15,7 @@
 #ifndef ADDUSEROBJECTSINGLEVARIABLE_H
 #define ADDUSEROBJECTSINGLEVARIABLE_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddUserObjectSingleVariable;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddUserObjectSingleVariable>();
 
 
-class AddUserObjectSingleVariable : public AddVariableAction
+class AddUserObjectSingleVariable : public Action
 {
 public:
   AddUserObjectSingleVariable(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddUserObjectSingleVariable_H
+#endif // ADDUSEROBJECTSINGLEVARIABLE_H

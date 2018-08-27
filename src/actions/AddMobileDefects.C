@@ -13,48 +13,29 @@
 /****************************************************************/
 
 #include "AddMobileDefects.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddVariableAction.h"
 #include "Conversion.h"
-#include "DirichletBC.h"
-#include "MobileDefects.h"
 
-#include <sstream>
-#include <stdexcept>
-#include <algorithm>
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
+registerMooseAction("GeminioApp", AddMobileDefects, "add_kernel");
 
 template<>
 InputParameters validParams<AddMobileDefects>()
 {
-  MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
-  MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
-
-  InputParameters params = validParams<AddVariableAction>();
+  InputParameters params = validParams<Action>();
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   params.addRequiredParam<unsigned int>("max_mobile_v", "maximum size of mobile vacancy cluster");
   params.addRequiredParam<unsigned int>("max_mobile_i", "maximum size of mobile intersitial cluster");
-  params.addRequiredParam<std::string>("group_constant", "user object name");
+  params.addRequiredParam<UserObjectName>("group_constant", "User object holding the grouping method parameterization");
   params.addParam<Real>("dislocation",0.0,"dislocation density");
   params.addParam<std::vector<Real> >("disl_mobile_v", "A vector of dislocation bias for mobile species");
   params.addParam<std::vector<Real> >("disl_mobile_i", "A vector of dislocation bias for mobile species");
   return params;
 }
 
-
 AddMobileDefects::AddMobileDefects(const InputParameters & params) :
-    AddVariableAction(params)
+    Action(params)
 {
 }
 
@@ -74,7 +55,7 @@ AddMobileDefects::act()
     i_size.push_back(i+1);
 
   const auto disl = getParam<Real>("dislocation");
-  std::string uo = getParam<std::string>("group_constant");
+  const auto group_constant_name = getParam<UserObjectName>("group_constant");
   std::vector<Real> disl_v = getParam<std::vector<Real> >("disl_mobile_v");
   std::vector<Real> disl_i = getParam<std::vector<Real> >("disl_mobile_i");
 
@@ -112,7 +93,7 @@ AddMobileDefects::act()
     params.set<std::vector<VariableName> > ("coupled_i_vars") = coupled_i_vars;
     params.set<Real>("dislocation") = disl;
     params.set<Real>("dislocation_factor") = coef;
-    params.set<UserObjectName>("user_object") = uo;
+    params.set<UserObjectName>("user_object") = group_constant_name;
     params.set<unsigned int>("number_v") = number_v;
     params.set<unsigned int>("number_i") = number_i;
     params.set<std::vector<unsigned int> >("mobile_v_size") = v_size;
@@ -134,7 +115,7 @@ AddMobileDefects::act()
     params.set<std::vector<VariableName> > ("coupled_i_vars") = coupled_i_vars;
     params.set<Real>("dislocation") = disl;
     params.set<Real>("dislocation_factor") = coef;
-    params.set<UserObjectName>("user_object") = uo;
+    params.set<UserObjectName>("user_object") = group_constant_name;
     params.set<unsigned int>("number_v") = number_v;
     params.set<unsigned int>("number_i") = number_i;
     params.set<std::vector<unsigned int> >("mobile_v_size") = v_size;

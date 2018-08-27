@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddClusterICAction_H
+#endif // ADDCLUSTERICACTION_H

@@ -12,36 +12,18 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#include "AddLotsOfSink_disl.h"
+#include "AddLotsOfDislocationSinks.h"
 #include "MaterialParameters.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddVariableAction.h"
 #include "Conversion.h"
-#include "DirichletBC.h"
-//#include "DislocationSinkRate.h"
 
-#include <sstream>
-#include <stdexcept>
-
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
+registerMooseAction("GeminioApp", AddLotsOfDislocationSinks, "add_kernel");
 
 template<>
-InputParameters validParams<AddLotsOfSink_disl>()
+InputParameters validParams<AddLotsOfDislocationSinks>()
 {
-  MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
-  MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
-
-  InputParameters params = validParams<AddVariableAction>();
+  InputParameters params = validParams<Action>();
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   params.addRequiredParam<std::vector<unsigned int> >("mobile_v_size", "A vector of mobile species");
@@ -49,27 +31,26 @@ InputParameters validParams<AddLotsOfSink_disl>()
   params.addParam<std::string>("dislocation","", "the name of dislocation variable");
   params.addParam<std::string>("const_dislocation","","the name of dislocation from materials");
   params.addParam<Real>("dislocation_density",-1, "dislocation density");
-  params.addParam<bool>("custom_input",false,"true: use manually input coefficients");
+  params.addParam<bool>("custom_input", false, "Use manually input coefficients");
   params.addParam<std::vector<Real> >("diff_i", "diffusivity of i corresponding to the mobile_i_size list");
   params.addParam<std::vector<Real> >("diff_v", "diffusivity of v corresponding to the mobile_v_size list"); //if provided source_i or source_v, the function wouldn't be used.
-  params.addParam<Real>("Rid",0.6,"capture radius of interstitials by dislocations[nm]");
-  params.addParam<Real>("Rvd",0.5,"capture radius of interstitials by dislocations[nm]");
-  params.addParam<Real>("i_disl_bias",1.1,"intersitial cluster efficiency factor");
-  params.addParam<Real>("v_disl_bias",1.0,"vacancy cluster efficiency factor");
-  params.addParam<Real>("temperature",800,"system temperature [K]");
+  params.addParam<Real>("Rid", 0.6, "capture radius of interstitials by dislocations[nm]");
+  params.addParam<Real>("Rvd", 0.5, "capture radius of interstitials by dislocations[nm]");
+  params.addParam<Real>("i_disl_bias", 1.1, "interstitial cluster efficiency factor");
+  params.addParam<Real>("v_disl_bias", 1.0, "vacancy cluster efficiency factor");
+  params.addParam<Real>("temperature", 800, "system temperature [K]");
   return params;
 }
 
-
-AddLotsOfSink_disl::AddLotsOfSink_disl(const InputParameters & params) :
-    AddVariableAction(params)
+AddLotsOfDislocationSinks::AddLotsOfDislocationSinks(const InputParameters & params) :
+    Action(params)
 {
 }
 
 void
-AddLotsOfSink_disl::act()
+AddLotsOfDislocationSinks::act()
 {
-  // selectively add mobile specise kernels
+  // selectively add mobile species kernels
   std::vector<unsigned int> v_size = getParam<std::vector<unsigned int> >("mobile_v_size");
   std::vector<unsigned int> i_size = getParam<std::vector<unsigned int> >("mobile_i_size");
   const auto rid = getParam<Real>("Rid");

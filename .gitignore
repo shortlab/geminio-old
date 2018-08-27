@@ -34,7 +34,7 @@ build
 lib
 .libs
 .clang-format
-Geminio-opt
-Geminio-oprof
-Geminio-dbg
-Geminio-devel
+geminio-opt
+geminio-oprof
+geminio-dbg
+geminio-devel

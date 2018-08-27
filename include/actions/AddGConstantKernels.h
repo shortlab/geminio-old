@@ -15,7 +15,7 @@
 #ifndef ADDGCONSTANTKERNELS_H
 #define ADDGCONSTANTKERNELS_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddGConstantKernels;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddGConstantKernels>();
 
 
-class AddGConstantKernels : public AddVariableAction
+class AddGConstantKernels : public Action
 {
 public:
   AddGConstantKernels(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddGConstantKernels_H
+#endif // ADDGCONSTANTKERNELS_H

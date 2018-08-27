@@ -137,8 +137,8 @@ absorb(int S1, int S2, std::string C1, std::string C2,Real T, int tag1, int tag2
     return 0.0;
 
   Real r_vi = 0.65e-3;//recombination radius in um
-  Real r1 = pow(S1*Vatom*3/4/PI,1.0/3); //cluster effective radius
-  Real r2 = pow(S2*Vatom*3/4/PI,1.0/3); //cluster effective radius
+  Real r1 = std::pow(S1*Vatom*3/4/PI, 1.0/3.0); //cluster effective radius
+  Real r2 = std::pow(S2*Vatom*3/4/PI, 1.0/3.0); //cluster effective radius
   Real D_s1 = D_prefactor(S1,C1)*exp(-energy(S1,C1,"migration")/Boltz_const/T);
   Real D_s2 = D_prefactor(S2,C2)*exp(-energy(S2,C2,"migration")/Boltz_const/T);
   return 4*PI*(D_s1*tag1+D_s2*tag2)*(r1+r2+r_vi);
@@ -148,7 +148,7 @@ Real
 diff(int S1, std::string C1,Real T)
 {
   //in um^2/s
-  return D_prefactor(S1,C1)*exp(-energy(S1,C1,"migration")/Boltz_const/T);
+  return D_prefactor(S1,C1) * std::exp(-energy(S1,C1,"migration")/Boltz_const/T);
 }
 
 Real

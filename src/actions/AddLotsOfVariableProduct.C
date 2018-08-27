@@ -14,41 +14,24 @@
 
 #include "AddLotsOfVariableProduct.h"
 #include "MaterialParameters.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddVariableAction.h"
 #include "Conversion.h"
-#include "DirichletBC.h"
-#include "VariableProduct.h"
 
-#include <sstream>
-#include <stdexcept>
 #include <algorithm>
 
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
+registerMooseAction("GeminioApp", AddLotsOfVariableProduct, "add_kernel");
 
 template<>
 InputParameters validParams<AddLotsOfVariableProduct>()
 {
-  MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
-  MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
-
-  InputParameters params = validParams<AddVariableAction>();
+  InputParameters params = validParams<Action>();
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   params.addRequiredParam<std::vector<unsigned int> >("mobile_v_size", "A vector of mobile species sizes");
   params.addRequiredParam<std::vector<unsigned int> >("mobile_i_size", "A vector of mobile species sizes");
-  params.addParam<Real>("temperature",600.0,"Temperature");
-  params.addParam<bool>("custom_input",false,"true: use manually input data");
+  params.addParam<Real>("temperature", 600.0, "Temperature");
+  params.addParam<bool>("custom_input", false, "true: use manually input data");
   params.addParam<std::vector<Real> >("absorb_vv", "absorption coefficient between v and v; row of 1 to n_v and column of 1 to n_v (n_v x n_v)");
   params.addParam<std::vector<Real> >("absorb_ii", "absorption coefficient between v and v; row of 1 to n_i and column of 1 to n_i (n_i x n_i)");
   params.addParam<std::vector<Real> >("absorb_vi", "absorption coefficient between i and v; row of 1 to n_v and column of 1 to n_i (n_v x n_i)");
@@ -56,7 +39,7 @@ InputParameters validParams<AddLotsOfVariableProduct>()
 }
 
 AddLotsOfVariableProduct::AddLotsOfVariableProduct(const InputParameters & params) :
-    AddVariableAction(params)
+    Action(params)
 {
 }
 

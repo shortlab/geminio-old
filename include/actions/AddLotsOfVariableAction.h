@@ -15,7 +15,7 @@
 #ifndef ADDLOTSOFVARIABLEACTION_H
 #define ADDLOTSOFVARIABLEACTION_H
 
-#include "AddVariableAction.h"
+#include "GeminioAddVariableAction.h"
 
 class AddLotsOfVariableAction;
 
@@ -23,15 +23,12 @@ template<>
 InputParameters validParams<AddLotsOfVariableAction>();
 
 
-class AddLotsOfVariableAction : public AddVariableAction
+class AddLotsOfVariableAction : public GeminioAddVariableAction
 {
 public:
   AddLotsOfVariableAction(const  InputParameters & parameters);
 
   virtual void act();
-
-private:
-  static const Real _abs_zero_tol;
 };
 
 #endif // ADDLOTSOFVARIABLEACTION_H

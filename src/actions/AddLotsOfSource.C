@@ -13,57 +13,43 @@
 /****************************************************************/
 
 #include "AddLotsOfSource.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddVariableAction.h"
 #include "Conversion.h"
-#include "BodyForce.h"
 
-#include <sstream>
-#include <stdexcept>
-
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
+registerMooseAction("GeminioApp", AddLotsOfSource, "add_kernel");
 
 template<>
 InputParameters validParams<AddLotsOfSource>()
 {
-  MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
-  MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
-
-  InputParameters params = validParams<AddVariableAction>();
+  InputParameters params = validParams<Action>();
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   params.addRequiredParam<std::vector<Real> >("source_v_size", "A vector of distribution of creation along ion range");
   params.addRequiredParam<std::vector<Real> >("source_i_size", "A vector of distribution of creation along ion range");
   params.addParam<std::string>("func_pre_name", "the sub-block name of [functions]");
-  params.addParam<bool>("custom_input",false,"true: use manually input coefficients");
+  params.addParam<bool>("custom_input", false, "Use manually input coefficients");
   params.addParam<std::vector<Real> >("source_i", "production of i clusters for source_i_size species");
-  params.addParam<std::vector<Real> >("source_v", "production of v clusters for 1 source_v_size species"); //!!!if provided source_i or source_v (constant for each size), the function wouldn't be necessary. In other words, provide either function or source_i and source_v
+  params.addParam<std::vector<Real> >("source_v", "production of v clusters for 1 source_v_size species"); 
   return params;
 }
 
-
 AddLotsOfSource::AddLotsOfSource(const InputParameters & params) :
-    AddVariableAction(params)
+    Action(params)
 {
+  // if provided source_i or source_v (constant for each size), the function wouldn't be necessary. 
+  // In other words, provide either function or source_i and source_v
+  if (isParamValid("func_pre_name") && (isParamValid("source_i") || isParamValid("source_i")))
+    paramError("func_pre_name", "Specify either 'func_pre_name' or 'source_i' and 'source_i'");
 }
 
 void
 AddLotsOfSource::act()
 {
-  std::vector<Real> v_size = getParam<std::vector<Real> >("source_v_size");
-  std::vector<Real> i_size = getParam<std::vector<Real> >("source_i_size");
-  std::vector<Real> vv = getParam<std::vector<Real> >("source_v");
-  std::vector<Real> ii = getParam<std::vector<Real> >("source_i");
+  auto v_size = getParam<std::vector<Real> >("source_v_size");
+  auto i_size = getParam<std::vector<Real> >("source_i_size");
+  auto vv = getParam<std::vector<Real> >("source_v");
+  auto ii = getParam<std::vector<Real> >("source_i");
   const auto custom = getParam<bool>("custom_input");
   const auto _total_v = getParam<unsigned int>("number_v");
   const auto _total_i = getParam<unsigned int>("number_i");

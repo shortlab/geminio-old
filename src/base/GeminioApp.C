@@ -40,7 +40,7 @@
 #include "AddLotsOfSingleVariable.h"
 #include "AddLotsOfSource.h"
 #include "AddClusterICAction.h"
-#include "AddLotsOfSink_disl.h"
+#include "AddLotsOfDislocationSinks.h"
 #include "AddLotsOfVariableAction.h"
 #include "AddUserObjectVariableProduct.h"
 #include "AddUserObjectSingleVariable.h"
@@ -194,7 +194,7 @@ GeminioApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   registerAction(AddLotsOfSource,"add_kernel");
   registerAction(AddUserObjectVariableProduct, "add_kernel");
   registerAction(AddClusterICAction, "add_ic");
-  registerAction(AddLotsOfSink_disl,"add_kernel");
+  registerAction(AddLotsOfDislocationSinks,"add_kernel");
   registerAction(AddLotsOfVariableAction,"add_variable");
   registerAction(AddLotsOfVariableAction,"add_ic");
   registerAction(AddLotsOfVariableAction,"add_bc");
@@ -213,7 +213,7 @@ GeminioApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   syntax.registerActionSyntax("AddUserObjectDislocationSink", "LotsOfUserObjectDislocationSink/*");
   syntax.registerActionSyntax("AddLotsOfSource", "LotsOfSource/*");
   syntax.registerActionSyntax("AddClusterICAction", "ClusterIC/*");
-  syntax.registerActionSyntax("AddLotsOfSink_disl", "LotsOfSink_disl/*");
+  syntax.registerActionSyntax("AddLotsOfDislocationSinks", "LotsOfSink_disl/*");
   syntax.registerActionSyntax("AddLotsOfVariableAction", "LotsOfVariables/*");
   syntax.registerActionSyntax("AddMobileDefects", "MobileDefects/*");
   syntax.registerActionSyntax("AddImmobileDefects", "ImmobileDefects/*");

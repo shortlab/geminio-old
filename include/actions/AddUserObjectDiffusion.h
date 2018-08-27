@@ -15,7 +15,7 @@
 #ifndef ADDUSEROBJECTDIFFUSION_H
 #define ADDUSEROBJECTDIFFUSION_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddUserObjectDiffusion;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddUserObjectDiffusion>();
 
 
-class AddUserObjectDiffusion : public AddVariableAction
+class AddUserObjectDiffusion : public Action
 {
 public:
   AddUserObjectDiffusion(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddUserObjectDiffusion_H
+#endif // ADDUSEROBJECTDIFFUSION_H

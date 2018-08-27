@@ -15,7 +15,7 @@
 #ifndef ADDUSEROBJECTDISLOCATIONSINK_H
 #define ADDUSEROBJECTDISLOCATIONSINK_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddUserObjectDislocationSink;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddUserObjectDislocationSink>();
 
 
-class AddUserObjectDislocationSink : public AddVariableAction
+class AddUserObjectDislocationSink : public Action
 {
 public:
   AddUserObjectDislocationSink(const  InputParameters & parameters);

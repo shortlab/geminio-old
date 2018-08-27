@@ -15,7 +15,7 @@
 #ifndef ADDLOTSOFSOURCE_H
 #define ADDLOTSOFSOURCE_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddLotsOfSource;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddLotsOfSource>();
 
 
-class AddLotsOfSource : public AddVariableAction
+class AddLotsOfSource : public Action
 {
 public:
   AddLotsOfSource(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddLotsOfSource_H
+#endif // ADDLOTSOFSOURCE_H

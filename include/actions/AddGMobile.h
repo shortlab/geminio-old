@@ -15,7 +15,7 @@
 #ifndef ADDGMOBILE_H
 #define ADDGMOBILE_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddGMobile;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddGMobile>();
 
 
-class AddGMobile : public AddVariableAction
+class AddGMobile : public Action
 {
 public:
   AddGMobile(const  InputParameters & parameters);

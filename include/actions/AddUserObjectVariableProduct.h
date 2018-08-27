@@ -15,7 +15,7 @@
 #ifndef ADDUSEROBJECTVARIABLEPRODUCT_H
 #define ADDUSEROBJECTVARIABLEPRODUCT_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddUserObjectVariableProduct;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddUserObjectVariableProduct>();
 
 
-class AddUserObjectVariableProduct : public AddVariableAction
+class AddUserObjectVariableProduct : public Action
 {
 public:
   AddUserObjectVariableProduct(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // ADDLOTSOFVariableProduct_H
+#endif // ADDUSEROBJECTVARIABLEPRODUCT_H

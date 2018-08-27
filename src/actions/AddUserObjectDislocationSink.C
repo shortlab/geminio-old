@@ -13,45 +13,27 @@
 /****************************************************************/
 
 #include "AddUserObjectDislocationSink.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddVariableAction.h"
 #include "Conversion.h"
-#include "DirichletBC.h"
-#include "UserObjectSingleVariable.h"
 
-#include <sstream>
-#include <stdexcept>
-#include <algorithm>
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
+registerMooseAction("GeminioApp", AddUserObjectDislocationSink, "add_kernel");
 
 template<>
 InputParameters validParams<AddUserObjectDislocationSink>()
 {
-  MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
-  MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
-
-  InputParameters params = validParams<AddVariableAction>();
+  InputParameters params = validParams<Action>();
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   params.addRequiredParam<std::vector<unsigned int> >("mobile_v_size", "A vector of mobile species");
   params.addRequiredParam<std::vector<unsigned int> >("mobile_i_size", "A vector of mobile species");
-  params.addRequiredParam<std::string>("group_constant", "user object name");
+  params.addRequiredParam<UserObjectName>("group_constant", "user object name");
   params.addRequiredParam<std::string>("call_function", "map to function to call in the userobject");
   return params;
 }
 
 AddUserObjectDislocationSink::AddUserObjectDislocationSink(const InputParameters & params) :
-    AddVariableAction(params)
+    Action(params)
 {
 }
 
@@ -63,7 +45,7 @@ AddUserObjectDislocationSink::act()
   // const auto number_i = getParam<unsigned int>("number_i");
   std::vector<unsigned int> v_size = getParam<std::vector<unsigned int> >("mobile_v_size");
   std::vector<unsigned int> i_size = getParam<std::vector<unsigned int> >("mobile_i_size");
-  std::string uo = getParam<std::string>("group_constant");
+  std::string group_constant_name = getParam<UserObjectName>("group_constant");
   std::string call_function = getParam<std::string>("call_function");
   std::vector<Real> vv,ii;
 
@@ -86,7 +68,7 @@ AddUserObjectDislocationSink::act()
     InputParameters params = _factory.getValidParams("UserObjectSingleVariable");
     params.set<NonlinearVariableName>("variable") = var_name_v;
     params.set<Real>("coeff") = coef; // loss "+"
-    params.set<UserObjectName>("user_object") = uo;
+    params.set<UserObjectName>("user_object") = group_constant_name;
     params.set<std::string>("call_function") = call_function;
     _problem->addKernel("UserObjectSingleVariable", "DislocationSink_" + var_name_v + Moose::stringify(cur_num), params);
     _console << "add UserObjectSingleVariable disl: " << var_name_v << ", coef: " << coef << '\n';
@@ -100,7 +82,7 @@ AddUserObjectDislocationSink::act()
     InputParameters params = _factory.getValidParams("UserObjectSingleVariable");
     params.set<NonlinearVariableName>("variable") = var_name_i;
     params.set<Real>("coeff") = coef; // loss "+"
-    params.set<UserObjectName>("user_object") = uo;
+    params.set<UserObjectName>("user_object") = group_constant_name;
     params.set<std::string>("call_function") = call_function;
     _problem->addKernel("UserObjectSingleVariable", "DislocationSink_" + var_name_i + Moose::stringify(cur_num), params);
     _console << "add UserObjectSingleVariable disl: " << var_name_i << ", coef: " << coef << '\n';

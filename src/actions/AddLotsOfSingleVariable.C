@@ -14,40 +14,21 @@
 
 #include "AddLotsOfSingleVariable.h"
 #include "MaterialParameters.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddVariableAction.h"
 #include "Conversion.h"
-#include "DirichletBC.h"
-#include "SingleVariable.h"
 
-#include <sstream>
-#include <stdexcept>
-#include <algorithm>
-
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
+registerMooseAction("GeminioApp", AddLotsOfSingleVariable, "add_kernel");
 
 template<>
 InputParameters validParams<AddLotsOfSingleVariable>()
 {
-  MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
-  MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
-
-  InputParameters params = validParams<AddVariableAction>();
+  InputParameters params = validParams<Action>();
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   params.addRequiredParam<std::vector<unsigned int> >("mobile_v_size", "A vector of mobile species");
   params.addRequiredParam<std::vector<unsigned int> >("mobile_i_size", "A vector of mobile species");
-  params.addParam<bool>("custom_input",false,"true: use manually input data");
+  params.addParam<bool>("custom_input", false, "Use manually input data");
   params.addParam<std::vector<Real> >("emit_vv", "emission coefficient from size > 1");
   params.addParam<std::vector<Real> >("emit_ii", "emission coefficient from size > 1");
   params.addParam<Real>("temperature", 600.0, "Temperature");
@@ -55,7 +36,7 @@ InputParameters validParams<AddLotsOfSingleVariable>()
 }
 
 AddLotsOfSingleVariable::AddLotsOfSingleVariable(const InputParameters & params) :
-    AddVariableAction(params)
+    Action(params)
 {
 }
 
@@ -69,7 +50,7 @@ AddLotsOfSingleVariable::act()
   std::vector<unsigned int> i_size = getParam<std::vector<unsigned int> >("mobile_i_size");
   const auto temp = getParam<Real>("temperature");
   const auto custom = getParam<bool>("custom_input");
-  std::vector<Real> vv,ii;
+  std::vector<Real> vv, ii;
 
   // used to mark mobility, 1: mobile; 0: immobile
   int tagi = 0, tagj = 1;

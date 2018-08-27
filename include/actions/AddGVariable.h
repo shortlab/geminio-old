@@ -15,7 +15,7 @@
 #ifndef ADDGVARIABLE_H
 #define ADDGVARIABLE_H
 
-#include "AddVariableAction.h"
+#include "GeminioAddVariableAction.h"
 
 class AddGVariable;
 
@@ -23,15 +23,12 @@ template<>
 InputParameters validParams<AddGVariable>();
 
 
-class AddGVariable : public AddVariableAction
+class AddGVariable : public GeminioAddVariableAction
 {
 public:
   AddGVariable(const  InputParameters & parameters);
 
   virtual void act();
-
-private:
-  static const Real _abs_zero_tol;
 };
 
 #endif // ADDLOTSOFVARIABLEACTION_H

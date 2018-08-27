@@ -15,7 +15,7 @@
 #ifndef ADDLOTSOFVARIABLEPRODUCT_H
 #define ADDLOTSOFVARIABLEPRODUCT_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddLotsOfVariableProduct;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddLotsOfVariableProduct>();
 
 
-class AddLotsOfVariableProduct : public AddVariableAction
+class AddLotsOfVariableProduct : public Action
 {
 public:
   AddLotsOfVariableProduct(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // ADDLOTSOFVariableProduct_H
+#endif // ADDLOTSOFVARIABLEPRODUCT_H

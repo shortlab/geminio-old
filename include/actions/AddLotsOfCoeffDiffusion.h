@@ -15,7 +15,7 @@
 #ifndef ADDLOTSOFCOEFFDIFFUSION_H
 #define ADDLOTSOFCOEFFDIFFUSION_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddLotsOfCoeffDiffusion;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddLotsOfCoeffDiffusion>();
 
 
-class AddLotsOfCoeffDiffusion : public AddVariableAction
+class AddLotsOfCoeffDiffusion : public Action
 {
 public:
   AddLotsOfCoeffDiffusion(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddLotsOfCoeffDiffusion_H
+#endif // ADDLOTSOFCOEFFDIFFUSION_H

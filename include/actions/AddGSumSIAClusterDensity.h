@@ -15,7 +15,7 @@
 #ifndef ADDGSUMSIACLUSTERDENSITY_H
 #define ADDGSUMSIACLUSTERDENSITY_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddGSumSIAClusterDensity;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddGSumSIAClusterDensity>();
 
 
-class AddGSumSIAClusterDensity : public AddVariableAction
+class AddGSumSIAClusterDensity : public Action
 {
 public:
   AddGSumSIAClusterDensity(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddGSumSIAClusterDensity_H
+#endif // ADDGSUMSIACLUSTERDENSITY_H

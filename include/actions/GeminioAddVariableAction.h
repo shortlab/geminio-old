@@ -12,23 +12,31 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef ADDLOTSOFSINGLEVARIABLE_H
-#define ADDLOTSOFSINGLEVARIABLE_H
+#ifndef GEMINIOADDVARIABLEACTION_H
+#define GEMINIOADDVARIABLEACTION_H
 
-#include "Action.h"
+#include "AddVariableAction.h"
+#include "MooseEnum.h"
 
-class AddLotsOfSingleVariable;
+class GeminioAddVariableAction;
 
 template<>
-InputParameters validParams<AddLotsOfSingleVariable>();
+InputParameters validParams<GeminioAddVariableAction>();
 
 
-class AddLotsOfSingleVariable : public Action
+class GeminioAddVariableAction : public AddVariableAction
 {
 public:
-  AddLotsOfSingleVariable(const  InputParameters & parameters);
+  GeminioAddVariableAction(const  InputParameters & parameters);
 
-  virtual void act();
+protected:
+  void addConstantIC(const std::string & var_name, Real initial);
+  
+  const MooseEnum _bc_type;
+  std::string _bc_name;
+  const Real _boundary_value;
+  const unsigned int _number_i;
+  const unsigned int _number_v;
 };
 
-#endif // ADDLOTSOFSINGLEVARIABLE_H
+#endif // GEMINIOADDVARIABLEACTION_H

@@ -15,7 +15,7 @@
 #ifndef ADDGIMMOBILE_H
 #define ADDGIMMOBILE_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
 class AddGImmobile;
 
@@ -23,7 +23,7 @@ template<>
 InputParameters validParams<AddGImmobile>();
 
 
-class AddGImmobile : public AddVariableAction
+class AddGImmobile : public Action
 {
 public:
   AddGImmobile(const  InputParameters & parameters);
@@ -31,4 +31,4 @@ public:
   virtual void act();
 };
 
-#endif // AddGImmobile_H
+#endif // ADDGIMMOBILE_H

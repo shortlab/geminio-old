@@ -13,25 +13,10 @@
 /****************************************************************/
 
 #include "AddClusterICAction.h"
-#include "Parser.h"
 #include "FEProblem.h"
 #include "Factory.h"
-#include "MooseEnum.h"
-#include "AddICAction.h"
-#include "Conversion.h"
-#include "ConstantIC.h"
 
-#include <sstream>
-#include <stdexcept>
-#include <algorithm>
-// libMesh includes
-#include "libmesh/libmesh.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/nonlinear_implicit_system.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/string_to_enum.h"
-#include "libmesh/fe.h"
+registerMooseAction("GeminioApp", AddClusterICAction, "add_ic");
 
 template<>
 InputParameters validParams<AddClusterICAction>()
@@ -39,13 +24,12 @@ InputParameters validParams<AddClusterICAction>()
   InputParameters params = validParams<Action>();
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
-  params.addRequiredParam<std::vector<unsigned int> >("IC_v_size","vacancy species number with initial concentration not ZERO");
-  params.addRequiredParam<std::vector<unsigned int> >("IC_i_size","interstitial species number with initial concentration not ZERO");
-  params.addRequiredParam<std::vector<Real> >("IC_v", "initial value for vacancy cluster correpsonding to IC_v_size");
+  params.addRequiredParam<std::vector<unsigned int> >("IC_v_size", "vacancy species number with initial concentration not ZERO");
+  params.addRequiredParam<std::vector<unsigned int> >("IC_i_size", "interstitial species number with initial concentration not ZERO");
+  params.addRequiredParam<std::vector<Real> >("IC_v", "initial value for vacancy cluster corresponding to IC_v_size");
   params.addRequiredParam<std::vector<Real> >("IC_i", "initial value for interstitial cluster corresponding to IC_i_size");
   return params;
 }
-
 
 AddClusterICAction::AddClusterICAction(const InputParameters & params) :
     Action(params)

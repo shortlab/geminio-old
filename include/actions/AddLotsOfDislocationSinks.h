@@ -12,23 +12,23 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef ADDLOTSOFSINK_DISL_H
-#define ADDLOTSOFSINK_DISL_H
+#ifndef ADDLOTSOFDISLOCATIONSINKS_H
+#define ADDLOTSOFDISLOCATIONSINKS_H
 
-#include "AddVariableAction.h"
+#include "Action.h"
 
-class AddLotsOfSink_disl;
+class AddLotsOfDislocationSinks;
 
 template<>
-InputParameters validParams<AddLotsOfSink_disl>();
+InputParameters validParams<AddLotsOfDislocationSinks>();
 
 
-class AddLotsOfSink_disl : public AddVariableAction
+class AddLotsOfDislocationSinks : public Action
 {
 public:
-  AddLotsOfSink_disl(const  InputParameters & parameters);
+  AddLotsOfDislocationSinks(const  InputParameters & parameters);
 
   virtual void act();
 };
 
-#endif // AddLotsOfSink_disl_H
+#endif // ADDLOTSOFDISLOCATIONSINKS_H
