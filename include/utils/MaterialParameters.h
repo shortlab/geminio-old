@@ -20,12 +20,21 @@
 #include <cmath>
 #include <algorithm>
 #include <cstring>
+
 #include "Moose.h"
 
-Real absorb(int,int,std::string,std::string,Real,int,int);
-Real emit(int,int,Real,std::string,std::string,int,int);
-Real energy(int,std::string,std::string);
-Real D_prefactor(int,std::string);
-Real diff(int, std::string,Real);
+namespace MaterialParameters
+{
+
+enum class Species { V, I };
+enum class EType { MIGRATION, BINDING };
+  
+Real absorb(int, int, Species, Species, Real, int, int);
+Real emit(int, int, Real, Species, Species, int, int);
+Real energy(int, Species, EType);
+Real D_prefactor(int, Species);
+Real diff(int, Species, Real);
+
+}
 
 #endif // MATERIALPARAMETERS_H

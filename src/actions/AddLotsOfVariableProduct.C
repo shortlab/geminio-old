@@ -75,7 +75,7 @@ AddLotsOfVariableProduct::act()
           tagj = 0;
 
         // TODO: need to add mobile information to the function
-        vv.push_back(absorb(i, j, "V", "V", temp, tagi, tagj));
+        vv.push_back(MaterialParameters::absorb(i, j, MaterialParameters::Species::V, MaterialParameters::Species::V, temp, tagi, tagj));
         // printf("absorb v %d with v %d: %lf\n",i,j,vv.back());
       }
     }
@@ -96,7 +96,7 @@ AddLotsOfVariableProduct::act()
           tagj = 1; // mobile
         else
           tagj = 0; // immobile
-        ii.push_back(absorb(i, j, "I", "I", temp, tagi, tagj));
+        ii.push_back(MaterialParameters::absorb(i, j, MaterialParameters::Species::I, MaterialParameters::Species::I, temp, tagi, tagj));
         // printf("absorb i %d with i %d: %lf\n",i,j,ii.back());
       }
     }
@@ -106,7 +106,7 @@ AddLotsOfVariableProduct::act()
     vi = getParam<std::vector<Real> >("absorb_vi");
   else {
     for (unsigned int i = 1; i <= number_v; ++i){
-      if (std::find(v_size.begin(),v_size.end(),i) != v_size.end())
+      if (std::find(v_size.begin(), v_size.end(),i) != v_size.end())
         tagi = 1; // mobile
       else
         tagi = 0; // immobile
@@ -118,7 +118,7 @@ AddLotsOfVariableProduct::act()
           tagj = 1; // mobile
         else
           tagj = 0; // immobile
-        vi.push_back(absorb(i, j, "V", "I", temp, tagi, tagj));
+        vi.push_back(MaterialParameters::absorb(i, j, MaterialParameters::Species::V, MaterialParameters::Species::I, temp, tagi, tagj));
         // printf("absorb v %d with i %d: %lf\n",i,j,vi.back());
       }
     }
@@ -127,7 +127,7 @@ AddLotsOfVariableProduct::act()
   // First comes with the kernels for vacancy clusters
   for (int cur_num = 1; cur_num <= number_v; cur_num++)
   {
-    std::string var_name_v = name() +"v"+ Moose::stringify(cur_num);
+    std::string var_name_v = name() + "v" + Moose::stringify(cur_num);
 
     // vi reaction down(-)
     for (int cur_num2 = 1; cur_num2 <= number_i; cur_num2++)
@@ -183,7 +183,7 @@ AddLotsOfVariableProduct::act()
 
   for (unsigned int cur_num = 1; cur_num <= number_v; cur_num++)
   {
-    std::string var_name_v = name() +"v"+ Moose::stringify(cur_num);
+    std::string var_name_v = name() + "v" + Moose::stringify(cur_num);
     //for (int j=1; j<= pairs_v; j++)
 
     // vv reaction up(+)
@@ -195,8 +195,8 @@ AddLotsOfVariableProduct::act()
       if (std::find(v_size.begin(),v_size.end(),j) != v_size.end() ||
           std::find(v_size.begin(),v_size.end(),cur_num-j) != v_size.end())
       {
-        std::string var_name2 = name() +"v"+ Moose::stringify(j);
-        std::string var_name3 = name() +"v"+ Moose::stringify(cur_num-j);
+        std::string var_name2 = name() + "v" + Moose::stringify(j);
+        std::string var_name3 = name() + "v" + Moose::stringify(cur_num-j);
         InputParameters params = _factory.getValidParams("VariableProduct");
         params.set<NonlinearVariableName>("variable") = var_name_v;
         params.set<std::vector<VariableName> > ("coupled_vars").push_back(var_name2);

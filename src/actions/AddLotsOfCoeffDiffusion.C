@@ -56,13 +56,13 @@ AddLotsOfCoeffDiffusion::act()
     vv = getParam<std::vector<Real> >("diff_v");
   else {
     for (unsigned int i = 0; i < v_size.size();i++){
-      vv.push_back(diff(v_size[i],"V",temp));}
+      vv.push_back(MaterialParameters::diff(v_size[i], MaterialParameters::Species::V, temp));}
   }
   if (isParamValid("diff_i") && custom == true)
     ii = getParam<std::vector<Real> >("diff_i");
   else {
     for (unsigned int i = 0; i < i_size.size();i++){
-      ii.push_back(diff(i_size[i],"I",temp));}
+      ii.push_back(MaterialParameters::diff(i_size[i], MaterialParameters::Species::I, temp));}
   }
   for (unsigned int cur_num = 1; cur_num <= v_size.size(); cur_num++)
   {

@@ -62,7 +62,7 @@ AddLotsOfSingleVariable::act()
         if (std::find( v_size.begin(),v_size.end(),i+1) != v_size.end())//find mobile species
             tagi = 1;
         else tagi = 0;
-        vv.push_back(emit(i+1,1,temp,"V","V",tagi,tagj));//emission of vacancy from i+1 cluster, a vector start with 0 (1->1)
+        vv.push_back(MaterialParameters::emit(i + 1, 1, temp, MaterialParameters::Species::V, MaterialParameters::Species::V, tagi, tagj));//emission of vacancy from i+1 cluster, a vector start with 0 (1->1)
         // printf("size: %d, emission: %f\n",i+1,vv.back());//test
         // vv.push_back(1.0);//test
     }
@@ -74,7 +74,7 @@ AddLotsOfSingleVariable::act()
         if (std::find(i_size.begin(),i_size.end(),i+1) != i_size.end())//find mobile species
             tagi = 1;
         else tagi = 0;
-        ii.push_back(emit(i+1,1,temp,"I","I",tagi,tagj));//emission of vacancy from i+1 cluster, a vector start with 0 (1->1)
+        ii.push_back(MaterialParameters::emit(i + 1, 1, temp, MaterialParameters::Species::I, MaterialParameters::Species::I, tagi, tagj));//emission of vacancy from i+1 cluster, a vector start with 0 (1->1)
         // printf("size: %d, emission: %f\n",-i-1,ii.back());//test
     }
   }
