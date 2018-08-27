@@ -10,6 +10,8 @@
 
 #define Boltz_const 8.6173315e-5 //boltzmann constant eV/K
 
+registerMooseObject("GeminioApp", GTungsten);
+
 template<>
 InputParameters validParams<GTungsten>()
 {

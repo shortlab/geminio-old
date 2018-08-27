@@ -14,6 +14,8 @@
 
 #include "VoidSinkRate.h"
 
+registerMooseObject("GeminioApp", VoidSinkRate);
+
 template<>
 InputParameters validParams<VoidSinkRate>()
 {

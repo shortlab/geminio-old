@@ -14,15 +14,17 @@
 
 #include "GSumSIAClusterDensity.h"
 
+registerMooseObject("GeminioApp", GSumSIAClusterDensity);
+
 template<>
 InputParameters validParams<GSumSIAClusterDensity>()
 {
   InputParameters params = validParams<AuxKernel>();
-  params.addRequiredCoupledVar("coupled_vars","coupled variables");
-  params.addParam<unsigned int>("lower_bound",1,"starting size to count, inclusive");
-  params.addParam<unsigned int>("upper_bound","ending size to count, inclusive");
+  params.addRequiredCoupledVar("coupled_vars", "coupled variables");
+  params.addParam<unsigned int>("lower_bound", 1, "starting size to count, inclusive");
+  params.addParam<unsigned int>("upper_bound", "ending size to count, inclusive");
   params.addParam<Real>("scale_factor", 1, "A scale factor to be applied to the variable");
-  params.addRequiredParam<UserObjectName>("user_object","The name of user object providing interaction constants");
+  params.addRequiredParam<UserObjectName>("user_object", "The name of user object providing interaction constants");
   return params;
 }
 

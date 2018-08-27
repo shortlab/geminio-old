@@ -14,6 +14,8 @@
 
 #include "UserObjectDiffusion.h"
 
+registerMooseObject("GeminioApp", UserObjectDiffusion);
+
 template<>
 InputParameters validParams<UserObjectDiffusion>()
 {

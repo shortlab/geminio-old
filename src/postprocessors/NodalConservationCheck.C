@@ -22,6 +22,8 @@
 // libMesh
 #include "libmesh/node.h"
 
+registerMooseObject("GeminioApp", NodalConservationCheck);
+
 template<>
 InputParameters validParams<NodalConservationCheck>()
 {

@@ -21,6 +21,8 @@
 #define Vatom 1.181e-11 //iron atom volume um^3
 #define Boltz_const 8.6173315e-5 //boltzmann constant eV/K
 
+registerMooseObject("GeminioApp", BCCIronProperty);
+
 template<>
 InputParameters validParams<BCCIronProperty>()
 {

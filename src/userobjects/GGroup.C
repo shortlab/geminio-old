@@ -13,6 +13,8 @@
 #include<algorithm>
 #define DEBUG 0
 
+registerMooseObject("GeminioApp", GGroup);
+
 template<>
 InputParameters validParams<GGroup>()
 {

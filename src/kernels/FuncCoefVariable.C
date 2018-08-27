@@ -11,7 +11,11 @@
 /*                                                              */
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
+
 #include "FuncCoefVariable.h"
+#include "Function.h"
+
+registerMooseObject("GeminioApp", FuncCoefVariable);
 
 template<>
 InputParameters validParams<FuncCoefVariable>()
@@ -30,13 +34,13 @@ FuncCoefVariable::FuncCoefVariable(const InputParameters & parameters) :
 Real
 FuncCoefVariable::computeQpResidual()
 {
-  Real k = _function.value(_t, _qp);
-  return k*_test[_i][_qp]*_u[_qp];
+  const Real k = _function.value(_t, _qp);
+  return k * _test[_i][_qp] * _u[_qp];
 }
 
 Real
 FuncCoefVariable::computeQpJacobian()
 {
-  Real k = _function.value(_t, _qp);
-  return k*_test[_i][_qp]*_phi[_j][_qp];
+  const Real k = _function.value(_t, _qp);
+  return k * _test[_i][_qp] * _phi[_j][_qp];
 }

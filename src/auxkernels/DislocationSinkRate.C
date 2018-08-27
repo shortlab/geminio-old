@@ -14,14 +14,16 @@
 
 #include "DislocationSinkRate.h"
 
+registerMooseObject("GeminioApp", DislocationSinkRate);
+
 template<>
 InputParameters validParams<DislocationSinkRate>()
 {
   InputParameters params = validParams<AuxKernel>();
-  params.addRequiredParam<std::string>("Diffusivity","The diffusivity to use in this calculation");
+  params.addRequiredParam<std::string>("Diffusivity", "The diffusivity to use in this calculation");
   // params.addRequiredParam<Real>("Diffusivity","The diffusivity to use in this calculation");
-  params.addParam<std::string>("DislocationDensity","","The location-dependent density of dislocations from material properties");
-  params.addCoupledVar("VariedDislocation",1.0e-4,"The location-dependent density of dislocations");
+  params.addParam<std::string>("DislocationDensity", "", "The location-dependent density of dislocations from material properties");
+  params.addCoupledVar("VariedDislocation", 1.0e-4, "The location-dependent density of dislocations");
   params.addParam<Real>("DislocationCoreSize", 10, "The core size of a dislocation, relative to this defect [nm]");
   return params;
 }

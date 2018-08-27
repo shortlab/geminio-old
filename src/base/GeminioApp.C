@@ -33,25 +33,6 @@
 #include "RadiationMaterial.h"
 #include "ArcMaterial.h"
 
-// ********************actions********************* //
-#include "AddLotsOfVariableProduct.h"
-#include "AddLotsOfTimeDerivative.h"
-#include "AddLotsOfCoeffDiffusion.h"
-#include "AddLotsOfSingleVariable.h"
-#include "AddLotsOfSource.h"
-#include "AddClusterICAction.h"
-#include "AddLotsOfDislocationSinks.h"
-#include "AddLotsOfVariableAction.h"
-#include "AddUserObjectVariableProduct.h"
-#include "AddUserObjectSingleVariable.h"
-#include "AddUserObjectDiffusion.h"
-#include "AddUserObjectDislocationSink.h"
-#include "AddMobileDefects.h"
-#include "AddImmobileDefects.h"
-#include "AddClusterDensity.h"
-#include "AddGVoidSwelling.h"
-#include "AddGSumSIAClusterDensity.h"
-
 //*************Postprocessors**********************//
 #include "NodalConservationCheck.h"
 #include "TotalDefectLoss.h"
@@ -91,7 +72,6 @@ template<>
 InputParameters validParams<GeminioApp>()
 {
   InputParameters params = validParams<MooseApp>();
-
   params.set<bool>("use_legacy_uo_initialization") = false;
   params.set<bool>("use_legacy_uo_aux_computation") = false;
   return params;
@@ -100,109 +80,54 @@ InputParameters validParams<GeminioApp>()
 GeminioApp::GeminioApp(const InputParameters & parameters) :
     MooseApp(parameters)
 {
-  srand(processor_id());
-
   Moose::registerObjects(_factory);
   GeminioApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
   GeminioApp::associateSyntax(_syntax, _action_factory);
+
+  Moose::registerExecFlags(_factory);
+  GeminioApp::registerExecFlags(_factory);
 }
 
-GeminioApp::~GeminioApp()
+GeminioApp::~GeminioApp() {}
+
+// External entry point for dynamic application loading
+extern "C" void
+GeminioApp__registerApps()
 {
+  GeminioApp::registerApps();
 }
-
 void
 GeminioApp::registerApps()
 {
   registerApp(GeminioApp);
 }
 
+// External entry point for dynamic object registration
+extern "C" void
+GeminioApp__registerObjects(Factory & factory)
+{
+  GeminioApp::registerObjects(factory);
+}
 void
 GeminioApp::registerObjects(Factory & factory)
 {
-  // Register kernels
-  registerKernel(DefectSink);
-  registerKernel(DefectSource);
-  registerKernel(DefectRecombination);
-  registerKernel(MatPropDiffusion);
-  registerKernel(FuncCoefVariable);
-  registerKernel(VariableProduct);
-  registerKernel(CoeffDiffusion);
-  registerKernel(SingleVariable);
-  registerKernel(UserObjectSingleVariable);
-  registerKernel(UserObjectDiffusion);
-  registerKernel(DislocationSink);
-  registerKernel(UserObjectVariableProduct);
-  registerKernel(MobileDefects);
-  registerKernel(ImmobileDefects);
-
-  // Register auxkernels
-  registerAux(DislocationSinkRate);
-  registerAux(DefectRecombinationRateConstant);
-  registerAux(VoidSinkRate);
-  registerAux(GVoidSwelling);
-  registerAux(ClusterDensity);
-  registerAux(GSumSIAClusterDensity);
-
-
-  // Register materials classes
-  registerMaterial(RadiationMaterial);
-  registerMaterial(ArcMaterial);
-
-  //register postprocessors
-  registerPostprocessor(NodalConservationCheck);
-  registerPostprocessor(TotalDefectLoss);
-
-  // Register UserObjects
-  registerUserObject(GroupConstant);
-  registerUserObject(MaterialConstants);
-
-  registerUserObject(TestProperty);
-  registerUserObject(GroupingTest);
-  registerUserObject(BCCIronProperty);
-
-
-//grouping method
-  //register kernels
-  registerKernel(GMobile);
-  registerKernel(GImmobileL0);
-  registerKernel(GImmobileL1);
-  registerKernel(ConstantKernel);
-  //register userobjects
-  registerUserObject(GGroup);
-  registerUserObject(GMaterialConstants);
-  registerUserObject(GGroupingTest);
-  registerUserObject(GIron);
-  registerUserObject(GTungsten);
-
-
+  Registry::registerObjectsTo(factory, {"GeminioApp"});
 }
 
+// External entry point for dynamic syntax association
+extern "C" void
+GeminioApp__associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+  GeminioApp::associateSyntax(syntax, action_factory);
+}
 void
 GeminioApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
-//actions
-  registerAction(AddLotsOfVariableProduct, "add_kernel");
-  registerAction(AddLotsOfTimeDerivative,"add_kernel");
-  registerAction(AddLotsOfCoeffDiffusion,"add_kernel");
-  registerAction(AddLotsOfSingleVariable,"add_kernel");
-  registerAction(AddUserObjectSingleVariable,"add_kernel");
-  registerAction(AddUserObjectDiffusion,"add_kernel");
-  registerAction(AddUserObjectDislocationSink,"add_kernel");
-  registerAction(AddLotsOfSource,"add_kernel");
-  registerAction(AddUserObjectVariableProduct, "add_kernel");
-  registerAction(AddClusterICAction, "add_ic");
-  registerAction(AddLotsOfDislocationSinks,"add_kernel");
-  registerAction(AddLotsOfVariableAction,"add_variable");
-  registerAction(AddLotsOfVariableAction,"add_ic");
-  registerAction(AddLotsOfVariableAction,"add_bc");
-  registerAction(AddMobileDefects,"add_kernel");
-  registerAction(AddImmobileDefects,"add_kernel");
-  registerAction(AddClusterDensity,"add_aux_kernel");
+  Registry::registerActionsTo(action_factory, {"GeminioApp"});
 
-//syntax
+  // Action syntax
   syntax.registerActionSyntax("AddLotsOfVariableProduct", "LotsOfVariableProduct/*");
   syntax.registerActionSyntax("AddUserObjectVariableProduct", "LotsOfUserObjectVariableProduct/*");
   syntax.registerActionSyntax("AddLotsOfTimeDerivative", "LotsOfTimeDerivative/*");
@@ -213,24 +138,14 @@ GeminioApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   syntax.registerActionSyntax("AddUserObjectDislocationSink", "LotsOfUserObjectDislocationSink/*");
   syntax.registerActionSyntax("AddLotsOfSource", "LotsOfSource/*");
   syntax.registerActionSyntax("AddClusterICAction", "ClusterIC/*");
-  syntax.registerActionSyntax("AddLotsOfDislocationSinks", "LotsOfSink_disl/*");
+  syntax.registerActionSyntax("AddLotsOfDislocationSinks", "LotsOfSink_disl/*"); // deprecated
+  syntax.registerActionSyntax("AddLotsOfDislocationSinks", "LotsOfDislocationSinks/*");
   syntax.registerActionSyntax("AddLotsOfVariableAction", "LotsOfVariables/*");
   syntax.registerActionSyntax("AddMobileDefects", "MobileDefects/*");
   syntax.registerActionSyntax("AddImmobileDefects", "ImmobileDefects/*");
   syntax.registerActionSyntax("AddClusterDensity", "ClusterDensity/*");
 
-//***grouping method
-//actions
-  registerAction(AddGVariable,"add_variable");
-  registerAction(AddGVariable,"add_ic");
-  registerAction(AddGVariable,"add_bc");
-  registerAction(AddGMobile,"add_kernel");
-  registerAction(AddGImmobile,"add_kernel");
-  registerAction(AddGTimeDerivative,"add_kernel");
-  registerAction(AddGConstantKernels,"add_kernel");
-  registerAction(AddGVoidSwelling,"add_aux_kernel");
-  registerAction(AddGSumSIAClusterDensity,"add_aux_kernel");
-//syntax
+  // Grouping method actions
   syntax.registerActionSyntax("AddGVariable","GVariable/*");
   syntax.registerActionSyntax("AddGMobile","GMobile/*");
   syntax.registerActionSyntax("AddGImmobile","GImmobile/*");
@@ -238,5 +153,15 @@ GeminioApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   syntax.registerActionSyntax("AddGConstantKernels", "Sources/*");
   syntax.registerActionSyntax("AddGVoidSwelling", "GVoidSwelling/*");
   syntax.registerActionSyntax("AddGSumSIAClusterDensity", "GSumSIAClusterDensity/*");
+}
 
+// External entry point for dynamic execute flag registration
+extern "C" void
+GeminioApp__registerExecFlags(Factory & factory)
+{
+  GeminioApp::registerExecFlags(factory);
+}
+void
+GeminioApp::registerExecFlags(Factory & /*factory*/)
+{
 }

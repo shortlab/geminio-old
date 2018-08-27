@@ -15,6 +15,8 @@
 #include "MobileDefects.h"
 #include "Conversion.h"
 
+registerMooseObject("GeminioApp", MobileDefects);
+
 template<>
 InputParameters validParams<MobileDefects>()
 {

@@ -15,6 +15,8 @@
 #include "GMobile.h"
 #include "Conversion.h"
 
+registerMooseObject("GeminioApp", GMobile);
+
 template<>
 InputParameters validParams<GMobile>()
 {

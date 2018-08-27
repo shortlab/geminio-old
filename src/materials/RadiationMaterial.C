@@ -14,6 +14,8 @@
 
 #include "RadiationMaterial.h"
 
+registerMooseObject("GeminioApp", RadiationMaterial);
+
 template<>
 InputParameters validParams<RadiationMaterial>()
 {

@@ -14,6 +14,8 @@
 
 #include "DislocationSink.h"
 
+registerMooseObject("GeminioApp", DislocationSink);
+
 template<>
 InputParameters validParams<DislocationSink>()
 {

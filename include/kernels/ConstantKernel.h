@@ -19,7 +19,6 @@
 
 //Forward Declarations
 class ConstantKernel;
-class Function;
 
 template<>
 InputParameters validParams<ConstantKernel>();

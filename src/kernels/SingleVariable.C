@@ -14,6 +14,8 @@
 
 #include "SingleVariable.h"
 
+registerMooseObject("GeminioApp", SingleVariable);
+
 template<>
 InputParameters validParams<SingleVariable>()
 {

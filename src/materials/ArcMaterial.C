@@ -14,6 +14,8 @@
 
 #include "ArcMaterial.h"
 
+registerMooseObject("GeminioApp", ArcMaterial);
+
 template<>
 InputParameters validParams<ArcMaterial>()
 {

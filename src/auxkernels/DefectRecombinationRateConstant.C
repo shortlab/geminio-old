@@ -14,6 +14,8 @@
 
 #include "DefectRecombinationRateConstant.h"
 
+registerMooseObject("GeminioApp", DefectRecombinationRateConstant);
+
 template<>
 InputParameters validParams<DefectRecombinationRateConstant>()
 {

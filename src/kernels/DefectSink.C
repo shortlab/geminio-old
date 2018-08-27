@@ -14,6 +14,8 @@
 
 #include "DefectSink.h"
 
+registerMooseObject("GeminioApp", DefectSink);
+
 template<>
 InputParameters validParams<DefectSink>()
 {

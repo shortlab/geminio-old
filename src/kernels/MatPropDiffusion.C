@@ -14,6 +14,8 @@
 
 #include "MatPropDiffusion.h"
 
+registerMooseObject("GeminioApp", MatPropDiffusion);
+
 template<>
 InputParameters validParams<MatPropDiffusion>()
 {

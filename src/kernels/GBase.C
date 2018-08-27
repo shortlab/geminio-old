@@ -22,7 +22,7 @@ InputParameters validParams<GBase>()
   params.addRequiredParam<unsigned int>("number_v", "Maximum vacancy cluster size");
   params.addRequiredParam<unsigned int>("number_i", "Maximum interstitial cluster size");
   params.addCoupledVar("coupled_v_vars", "coupled vacancy type variables");
-  params.addCoupledVar("coupled_i_vars", "coupled intersitial type variables");
+  params.addCoupledVar("coupled_i_vars", "coupled interstitial type variables");
   params.addRequiredParam<unsigned int>("max_mobile_v", "A vector of mobile species");
   params.addRequiredParam<unsigned int>("max_mobile_i", "A vector of mobile species");
   params.addRequiredParam<UserObjectName>("user_object", "The name of user object providing interaction constants");

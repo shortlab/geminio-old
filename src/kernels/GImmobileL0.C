@@ -15,6 +15,8 @@
 #include "GImmobileL0.h"
 #include "Conversion.h"
 
+registerMooseObject("GeminioApp", GImmobileL0);
+
 template<>
 InputParameters validParams<GImmobileL0>()
 {

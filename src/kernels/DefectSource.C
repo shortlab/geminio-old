@@ -14,6 +14,8 @@
 
 #include "DefectSource.h"
 
+registerMooseObject("GeminioApp", DefectSource);
+
 template<>
 InputParameters validParams<DefectSource>()
 {

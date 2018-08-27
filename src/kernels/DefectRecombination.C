@@ -14,6 +14,8 @@
 
 #include "DefectRecombination.h"
 
+registerMooseObject("GeminioApp", DefectRecombination);
+
 template<>
 InputParameters validParams<DefectRecombination>()
 {

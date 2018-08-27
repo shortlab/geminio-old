@@ -9,8 +9,11 @@
 // calculate group constant based on hypothetical shape functions
 
 #include "GroupConstant.h"
-#include<math.h>
-#include<algorithm>
+
+#include <cmath>
+#include <algorithm>
+
+registerMooseObject("GeminioApp", GroupConstant);
 
 template<>
 InputParameters validParams<GroupConstant>()

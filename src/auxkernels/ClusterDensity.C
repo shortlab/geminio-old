@@ -14,6 +14,8 @@
 
 #include "ClusterDensity.h"
 
+registerMooseObject("GeminioApp", ClusterDensity);
+
 template<>
 InputParameters validParams<ClusterDensity>()
 {
@@ -41,7 +43,8 @@ ClusterDensity::ClusterDensity(const InputParameters & parameters)
 Real
 ClusterDensity::computeValue()
 {
-  Real total = 0.0;//total defect cluster concentration
+  // total defect cluster concentration
+  Real total = 0.0;
   const auto no_vars = _no_vars.size() ;
   for (unsigned int i = 0; i < no_vars; ++i)
     total += (*_val_vars[i])[_qp];

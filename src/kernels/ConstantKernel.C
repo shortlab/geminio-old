@@ -14,21 +14,21 @@
 
 #include "ConstantKernel.h"
 #include <limits>
-// MOOSE
-#include "Function.h"
+
+registerMooseObject("GeminioApp", ConstantKernel);
 
 template<>
 InputParameters validParams<ConstantKernel>()
 {
   InputParameters params = validParams<Kernel>();
-  params.addParam<Real>("value",0.0,"add kernel: -value*_test[_i][_qp]");
-  params.addParam<Real>("tlimit","set lifetime for the kernel");
+  params.addParam<Real>("value", 0.0, "add kernel: -value * _test[_i][_qp]");
+  params.addParam<Real>("tlimit", std::numeric_limits<Real>::max(), "set lifetime for the kernel");
   return params;
 }
 
 ConstantKernel::ConstantKernel(const InputParameters & parameters) :
     Kernel(parameters),
-    _t_limit(isParamValid("tlimit")?getParam<Real>("tlimit"):std::numeric_limits<Real>::max()),
+    _t_limit(getParam<Real>("tlimit")),
     _val(getParam<Real>("value"))
 {
 }
@@ -36,8 +36,8 @@ ConstantKernel::ConstantKernel(const InputParameters & parameters) :
 Real
 ConstantKernel::computeQpResidual()
 {
-  if (_t<_t_limit)
-    return -_val*_test[_i][_qp];
+  if (_t < _t_limit)
+    return -_val * _test[_i][_qp];
   return 0.0;
 }
 

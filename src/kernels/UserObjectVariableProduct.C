@@ -14,6 +14,8 @@
 
 #include "UserObjectVariableProduct.h"
 
+registerMooseObject("GeminioApp", UserObjectVariableProduct);
+
 template<>
 InputParameters validParams<UserObjectVariableProduct>()
 {

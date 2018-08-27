@@ -15,6 +15,8 @@
 #include "ImmobileDefects.h"
 #include "Conversion.h"
 
+registerMooseObject("GeminioApp", ImmobileDefects);
+
 template<>
 InputParameters validParams<ImmobileDefects>()
 {
@@ -22,7 +24,7 @@ InputParameters validParams<ImmobileDefects>()
   params.addRequiredParam<int>("number_v","Maximum vacancy cluster size");
   params.addRequiredParam<int>("number_i","Maximum interstitial cluster size");
   params.addCoupledVar("coupled_v_vars","coupled vacancy type variables");
-  params.addCoupledVar("coupled_i_vars","coupled intersitial type variables");
+  params.addCoupledVar("coupled_i_vars","coupled interstitial type variables");
   params.addRequiredParam<std::vector<int> >("mobile_v_size", "A vector of mobile species, sorted by custom action");
   params.addRequiredParam<std::vector<int> >("mobile_i_size", "A vector of mobile species, sorted by custom action");
   params.addRequiredParam<UserObjectName>("user_object","The name of user object providing interaction constants");

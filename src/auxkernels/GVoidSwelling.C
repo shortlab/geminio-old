@@ -14,20 +14,21 @@
 
 #include "GVoidSwelling.h"
 
+registerMooseObject("GeminioApp", GVoidSwelling);
+
 template<>
 InputParameters validParams<GVoidSwelling>()
 {
   InputParameters params = validParams<AuxKernel>();
-  params.addRequiredCoupledVar("coupled_v_vars","coupled vacancy type variables");
-  params.addRequiredParam<UserObjectName>("user_object","The name of user object providing interaction constants");
+  params.addRequiredCoupledVar("coupled_v_vars", "coupled vacancy type variables");
+  params.addRequiredParam<UserObjectName>("user_object", "The name of user object providing interaction constants");
   return params;
 }
 
 
-GVoidSwelling::GVoidSwelling(const
-                                   InputParameters & parameters)
-  :AuxKernel(parameters),
-  _gc(getUserObject<GGroup>("user_object"))
+GVoidSwelling::GVoidSwelling(const InputParameters & parameters)
+  : AuxKernel(parameters),
+    _gc(getUserObject<GGroup>("user_object"))
 {
   int nvcoupled = coupledComponents("coupled_v_vars");
   _no_v_vars.resize(nvcoupled);

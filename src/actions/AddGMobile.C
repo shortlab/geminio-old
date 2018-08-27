@@ -17,6 +17,8 @@
 #include "Factory.h"
 #include "Conversion.h"
 
+registerMooseAction("GeminioApp", AddGMobile, "add_kernel");
+
 template<>
 InputParameters validParams<AddGMobile>()
 {

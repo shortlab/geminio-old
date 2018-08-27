@@ -15,6 +15,7 @@
 #include "MooseMesh.h"
 #include "MaterialConstants.h"
 
+registerMooseObject("GeminioApp", MaterialConstants);
 
 template<>
 InputParameters validParams<MaterialConstants>()

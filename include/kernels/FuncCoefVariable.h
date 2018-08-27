@@ -14,12 +14,11 @@
 #ifndef FUNCCOEFVARIABLE_H
 #define FUNCCOEFVARIABLE_H
 
-// MOOSE includes
 #include "Kernel.h"
-#include "Function.h"
 
 //Forward Declarations
 class FuncCoefVariable;
+class Function;
 
 template<>
 InputParameters validParams<FuncCoefVariable>();
@@ -39,4 +38,4 @@ protected:
   Function &  _function;
 };
 
-#endif //FUNCCOEFDIFFUSION_H
+#endif // FUNCCOEFVARIABLE_H
