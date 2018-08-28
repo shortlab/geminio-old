@@ -23,15 +23,18 @@ class GMaterialConstants : public MaterialConstants
 public:
   GMaterialConstants(const InputParameters & parameters);
 
-  virtual Real absorbVV(int,int,int,Real) const;
-  virtual Real absorbVI(int,int,int,Real) const;
-  virtual Real absorbII(int,int,int,Real) const;
-  Real atomic_vol;
+  virtual Real absorbVV(int, int, int, Real) const { return 0.0; };
+  virtual Real absorbVI(int, int, int, Real) const { return 0.0; };
+  virtual Real absorbII(int, int, int, Real) const { return 0.0; };
 
+  Real getAtomicVol() const { return _atomic_vol; };
+  
 protected:
-  Real _rho_d;
-  Real _i_bias;
-  Real _v_bias;
+  const Real _rho_d;
+  const Real _i_bias;
+  const Real _v_bias;
+
+  const Real _atomic_vol;
 };
 
 template<>

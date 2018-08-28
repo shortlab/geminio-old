@@ -13,8 +13,8 @@
 /*     See COPYRIGHT for full restrictions       */
 /*************************************************/
 
-#ifndef GTungsten_H
-#define GTungsten_H
+#ifndef GTUNGSTEN_H
+#define GTUNGSTEN_H
 
 #include "GeneralUserObject.h"
 #include "GMaterialConstants.h"
@@ -24,23 +24,30 @@ class GTungsten : public GMaterialConstants
 public:
   GTungsten(const InputParameters & parameters);
 
-  Real absorb(int,int,std::string,std::string,Real,int,int) const;
-  Real absorbVV(int,int,int,Real) const;
-  Real absorbVI(int,int,int,Real) const;
-  Real absorbII(int,int,int,Real) const;
-  Real emit(int,int,Real,std::string,std::string,int,int) const;
-  Real disl_ksq(int,std::string,Real,int=1) const;
-  Real energy(int,std::string,std::string) const;
-  Real D_prefactor(int,std::string="") const;
-  Real diff(int, std::string,Real) const;
+  Real absorbVV(int, int, int, Real) const;
+  Real absorbVI(int, int, int, Real) const;
+  Real absorbII(int, int, int, Real) const;
 
-private:
-  Real Ev_formation,Ei_formation,Evb2,Eib2;//description in cpp file
-  Real Ei_binding_factor;
-  Real Ev_binding_factor;
+  Real absorb(int, int, MaterialParameters::Species,MaterialParameters::Species, Real, int, int) const;
+  Real emit(int, int, Real, MaterialParameters::Species, MaterialParameters::Species, int, int) const;
+  Real diff(int, MaterialParameters::Species, Real) const;
+  Real disl_ksq(int, MaterialParameters::Species, Real, bool mobile = true) const;
+
+protected:  
+  Real energy(int, MaterialParameters::Species, MaterialParameters::EType) const;
+  Real D_prefactor(int, MaterialParameters::Species) const;
+
+  const Real _burgers;
+  const Real _rvi;
+  const Real _Ev_formation;
+  const Real _Ei_formation;
+  const Real _Evb2;
+  const Real _Eib2;
+  const Real _Ei_binding_factor;
+  const Real _Ev_binding_factor;
 };
 
 template<>
 InputParameters validParams<GTungsten>();
 
-#endif
+#endif // GTUNGSTEN_H

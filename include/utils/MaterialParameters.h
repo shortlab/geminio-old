@@ -26,6 +26,9 @@
 namespace MaterialParameters
 {
 
+// Boltzmann constant eV/K
+const Real kB = 8.6173315e-5;
+
 enum class Species { V, I };
 enum class EType { MIGRATION, BINDING };
   

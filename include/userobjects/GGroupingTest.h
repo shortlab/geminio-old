@@ -19,29 +19,30 @@
 #include "GeneralUserObject.h"
 #include "GMaterialConstants.h"
 
+/**
+ * Based on test case (table 2) in GMIC++: Grouping method in C++: an efficient
+ * method to solve large number of Master equations
+ */
 class GGroupingTest : public GMaterialConstants
 {
 public:
   GGroupingTest(const InputParameters & parameters);
 
-  ~GGroupingTest(){}
-  virtual void initialize();
-  virtual void execute();
-  virtual void finalize();
+  Real absorbVV(int, int, int, Real) const override;
+  Real absorbVI(int, int, int, Real) const override;
+  Real absorbII(int, int, int, Real) const override;
 
-  Real absorb(int,int,std::string,std::string,Real,int,int) const;
-  Real absorbVV(int,int,int,Real) const;
-  Real absorbVI(int,int,int,Real) const;
-  Real absorbII(int,int,int,Real) const;
-  Real emit(int,int,Real,std::string,std::string,int,int) const;
-  Real disl_ksq(int,std::string,Real,int=1) const;
-  Real energy(int,std::string,std::string) const;
-  Real D_prefactor(int,std::string="") const;
-  Real diff(int, std::string,Real) const;
-
+  Real absorb(int, int, MaterialParameters::Species, MaterialParameters::Species, Real, int, int) const override;
+  Real emit(int, int, Real, MaterialParameters::Species, MaterialParameters::Species, int, int) const override;
+  Real diff(int,  MaterialParameters::Species, Real) const override;
+  Real disl_ksq(int, MaterialParameters::Species, Real, bool mobile = true) const override;
+  
+protected:
+  Real energy(int, MaterialParameters::Species, MaterialParameters::EType) const;
+  Real D_prefactor(int) const;
 };
 
 template<>
 InputParameters validParams<GGroupingTest>();
 
-#endif
+#endif // GGROUPINGTEST_H

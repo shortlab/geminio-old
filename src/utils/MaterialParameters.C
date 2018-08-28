@@ -13,10 +13,7 @@ const Real INF = 100.0;
 const Real SCALE = 1.0;
 
 //iron atom volume um^3
-const Real Vatom = 1.182e-11; 
-
-// Boltzmann constant eV/K
-const Real kBoltzmann = 8.6173315e-5; 
+const Real Vatom = 1.182e-11;
 
 Real
 energy(int s, Species species, EType e_type)
@@ -146,11 +143,11 @@ absorb(int S1, int S2, Species C1, Species C2, Real T, int tag1, int tag2)
 
   // recombination radius in um
   Real r_vi = 0.65e-3;
-  
+
   Real r1 = std::pow(S1 * Vatom * 3.0 / (4.0 * libMesh::pi), 1.0/3.0); //cluster effective radius
   Real r2 = std::pow(S2 * Vatom * 3.0 / (4.0 * libMesh::pi), 1.0/3.0); //cluster effective radius
-  Real D_s1 = D_prefactor(S1,C1) * std::exp(-energy(S1, C1, EType::MIGRATION) / (kBoltzmann * T));
-  Real D_s2 = D_prefactor(S2,C2) * std::exp(-energy(S2, C2, EType::MIGRATION) / (kBoltzmann * T));
+  Real D_s1 = D_prefactor(S1,C1) * std::exp(-energy(S1, C1, EType::MIGRATION) / (kB * T));
+  Real D_s2 = D_prefactor(S2,C2) * std::exp(-energy(S2, C2, EType::MIGRATION) / (kB * T));
   return 4.0 * libMesh::pi * (D_s1 * tag1 + D_s2 * tag2) * (r1 + r2 + r_vi);
 }
 
@@ -158,7 +155,7 @@ Real
 diff(int S1, Species C1, Real T)
 {
   //in um^2/s
-  return D_prefactor(S1,C1) * std::exp(-energy(S1, C1, EType::MIGRATION) / (kBoltzmann * T));
+  return D_prefactor(S1,C1) * std::exp(-energy(S1, C1, EType::MIGRATION) / (kB * T));
 }
 
 Real
@@ -167,8 +164,8 @@ emit(int S1, int S2, Real T, Species C1, Species /*C2*/, int tag1, int tag2)
   //for now only consider self species emission, S1 emits S2, S1==1
   if (S1 > S2 && S2 == 1)
     // unit: 1/s
-    return  absorb(S1, S2, C1, C1, T, tag1, tag2) / (Vatom * std::pow(SCALE, 3)) * std::exp(-energy(S1, C1, EType::BINDING) / (kBoltzmann * T));
-  
+    return  absorb(S1, S2, C1, C1, T, tag1, tag2) / (Vatom * std::pow(SCALE, 3)) * std::exp(-energy(S1, C1, EType::BINDING) / (kB * T));
+
   return 0.0;
 }
 

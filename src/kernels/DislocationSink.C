@@ -36,7 +36,7 @@ DislocationSink::DislocationSink(const
   :Kernel(parameters),
    _D_species(getParam<Real>("Diffusivity")),
    _prop_name_DD(getParam<std::string>("DislocationDensity")),
-   _dislocation_density(_prop_name_DD.empty() ? NULL : &getMaterialProperty<Real>(_prop_name_DD)),
+   _dislocation_density(_prop_name_DD.empty() ? nullptr : &getMaterialProperty<Real>(_prop_name_DD)),
    _varied_dislocation(isCoupled("VariedDislocation")? coupledValue("VariedDislocation"):_zero),
    _rho_disl(getParam<Real>("DislocationDensityValue")),
    _dislocation_core_size(getParam<Real>("DislocationCoreSize")),

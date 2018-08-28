@@ -1,16 +1,5 @@
-//********************pure iron under neutron irradiation*************//
-//*****calculate: Fe irradiation,  Neutron-induced swelling and embrittlement of pure iron and pure nickel irradiated in the BN-350 and BOR-60 fast reactors
-//*****parameters: Efficient simulation of kinetics of radiation induced defects: A cluster dynamics approach
-
-
 #include "MooseMesh.h"
 #include "GIron.h"
-
-#define INF 100
-#define SCALE 1 //change unit from um
-#define PI 3.14159265359
-#define Vatom 1.205e-11 //iron atom volume um^3
-#define Boltz_const 8.6173315e-5 //boltzmann constant eV/K
 
 registerMooseObject("GeminioApp", GIron);
 
@@ -18,138 +7,113 @@ template<>
 InputParameters validParams<GIron>()
 {
   InputParameters params = validParams<GMaterialConstants>();
-  params.addClassDescription( "Calculate specific material properties");
+  params.addClassDescription( "Calculate material properties for pure iron under neutron irradiation");
+
+  // iron atom volume um^3
+  params.set<Real>("atomic_vol") = 1.205e-11;
+
   return params;
 }
 
 GIron::GIron(const InputParameters & parameters)
-: GMaterialConstants(parameters)
+  : GMaterialConstants(parameters)
 {
-  // _console << "GIron constructed\n";
-}
-
-
-Real GIron::energy(int s,std::string species, std::string Etype) const{//unit:eV
-    Real E=0.0;
-    if ((species == "V") && (Etype == "migration")){
-//// from literature
-        switch(s){
-            case 1:
-            {
-                E = 0.83;
-                break;
-            }
-            case 2:
-            {
-                E = 0.62;
-                break;
-            }
-            case 3:
-            {
-                E = 0.35;
-                break;
-            }
-            case 4:
-            {
-                E = 0.48;
-                break;
-            }
-            default:
-                E = INF;
-        }
-    }
-    else if ((species == "I") && (Etype == "migration")){
-        switch(s){
-            case 1:
-            {
-                E = 0.34;
-                break;
-            }
-            case 2:
-            {
-                E = 0.42;
-                break;
-            }
-            case 3:
-            {
-                E = 0.43;
-                break;
-            }
-            default:
-                E = INF;
-        }
-    }
-    else if ((species == "V") && (Etype == "binding")){
-        switch(s){
-            case 1:
-            {
-                E = INF;
-                break;
-            }
-
-            case 2:
-            {
-                E = 0.30;
-                break;
-            }
-            case 3:
-            {
-                E = 0.37;
-                break;
-            }
-            case 4:
-            {
-                E = 0.62;
-                break;
-            }
-            case 5:
-            {
-                E = 0.73;
-                break;
-            }
-            default:
-            {
-                E = 2.2 + (0.3-2.2)/(pow(2.0,2.0/3)-1) * (pow(s,2.0/3)-pow(s-1,2.0/3));//capillary law
-            }
-        }
-
-    }
-    else if ((species == "I") && (Etype == "binding")) {
-        switch(s){
-            case 1:
-            {
-                E = INF;
-                break;
-            }
-            case 2:
-            {
-                E = 0.83;
-                break;
-            }
-            case 3:
-            {
-                E = 0.92;
-                break;
-            }
-            case 4:
-            {
-                E = 1.64;
-                break;
-            }
-            default:
-            {
-                //E = 3.8 - 5.06*(pow(s,2.0/3)-pow(s-1,2.0/3));//capillary law
-                E = 3.64 - 4.78378*(pow(s,2.0/3)-pow(s-1,2.0/3));//capillary law
-            }
-        }
-    }
-    else
-        mooseError("Energy not defined for " + Etype + " " + species);
-    return E;
 }
 
 Real
-GIron::D_prefactor(int /*s*/, std::string /*species*/) const
+GIron::energy(int s, MaterialParameters::Species species, MaterialParameters::EType e_type) const
+{
+  //unit:eV
+  if (species == MaterialParameters::Species::V && e_type == MaterialParameters::EType::MIGRATION)
+  {
+    // from literature
+    switch (s)
+    {
+      case 1:
+        return 0.83;
+
+      case 2:
+        return 0.62;
+
+      case 3:
+        return 0.35;
+
+      case 4:
+        return 0.48;
+
+      default:
+        return 100.0; // "INF"
+    }
+  }
+  else if (species == MaterialParameters::Species::I && e_type == MaterialParameters::EType::MIGRATION)
+  {
+    switch (s)
+    {
+      case 1:
+        return 0.34;
+
+      case 2:
+        return 0.42;
+
+      case 3:
+        return 0.43;
+
+      default:
+        return 100.0; // "INF"
+    }
+  }
+  else if (species == MaterialParameters::Species::V && e_type == MaterialParameters::EType::BINDING)
+  {
+    switch (s)
+    {
+      case 1:
+        return 100.0; // "INF"
+
+      case 2:
+        return 0.30;
+
+      case 3:
+        return 0.37;
+
+      case 4:
+        return 0.62;
+
+      case 5:
+        return 0.73;
+
+      default:
+        //capillary law
+        return 2.2 + (0.3 - 2.2) / (std::pow(2.0, 2.0/3.0) - 1.0) * (std::pow(s, 2.0/3.0) - std::pow(s - 1.0, 2.0/3.0));
+    }
+  }
+  else if (species == MaterialParameters::Species::I && e_type == MaterialParameters::EType::BINDING)
+  {
+    switch (s)
+    {
+      case 1:
+        return 100.0; // "INF"
+
+      case 2:
+        return 0.83;
+
+      case 3:
+        return 0.92;
+
+      case 4:
+        return 1.64;
+
+      default:
+        //E = 3.8 - 5.06*(pow(s,2.0/3)-pow(s-1,2.0/3));//capillary law
+        // capillary law
+        return 3.64 - 4.78378 * (std::pow(s, 2.0/3.0) - std::pow(s - 1.0, 2.0/3.0));
+    }
+  }
+
+  mooseError("Energy not defined");
+}
+
+Real
+GIron::D_prefactor(int /*s*/, MaterialParameters::Species /*species*/) const
 {
   Real D0 = 8.2e5; // um^2/s
   return D0;
@@ -157,40 +121,46 @@ GIron::D_prefactor(int /*s*/, std::string /*species*/) const
 
 //size S1 and S2
 Real
-GIron::absorb(int S1, int S2, std::string C1, std::string C2,Real T, int tag1, int tag2) const
+GIron::absorb(int S1, int S2, MaterialParameters::Species C1, MaterialParameters::Species C2, Real T, int tag1, int tag2) const
 {
   // tag1, tag2 denotes the mobility of C1 and C2; 1: mobile, 0: immobile
   if (tag1 == 0 && tag2 == 0)
     return 0.0;
 
   Real r_vi = 0.65e-3;//recombination radius in um
-  Real r1 = pow(S1*Vatom*3/4/PI,1.0/3); //cluster effective radius
-  Real r2 = pow(S2*Vatom*3/4/PI,1.0/3); //cluster effective radius
-  Real D_s1 = D_prefactor(S1,C1)*exp(-energy(S1,C1,"migration")/Boltz_const/T);
-  Real D_s2 = D_prefactor(S2,C2)*exp(-energy(S2,C2,"migration")/Boltz_const/T);
-  return 4*PI*(D_s1*tag1+D_s2*tag2)*(r1+r2+r_vi);
+  Real r1 = std::pow(S1 * _atomic_vol * 3.0/(4.0 * libMesh::pi), 1.0/3.0); //cluster effective radius
+  Real r2 = std::pow(S2 * _atomic_vol * 3.0/(4.0 * libMesh::pi), 1.0/3.0); //cluster effective radius
+  Real D_s1 = D_prefactor(S1, C1) * std::exp(-energy(S1, C1, MaterialParameters::EType::MIGRATION)/ (_kB * T));
+  Real D_s2 = D_prefactor(S2, C2) * std::exp(-energy(S2, C2, MaterialParameters::EType::MIGRATION)/ (_kB * T));
+  return 4*libMesh::pi*(D_s1*tag1+D_s2*tag2)*(r1+r2+r_vi);
 }
 
 Real
-GIron::diff(int S1, std::string C1,Real T) const
+GIron::diff(int S1, MaterialParameters::Species C1,Real T) const
 {
   // in um^2/s
-  return D_prefactor(S1,C1)*exp(-energy(S1,C1,"migration")/Boltz_const/T);
+  return D_prefactor(S1,C1) * std::exp(-energy(S1,C1,MaterialParameters::EType::MIGRATION)/ (_kB * T));
 }
 
 Real
-GIron::emit(int S1, int S2, Real T, std::string C1, std::string /*C2*/, int tag1, int tag2) const{
+GIron::emit(int S1, int S2, Real T, MaterialParameters::Species C1, MaterialParameters::Species /*C2*/, int tag1, int tag2) const
+{
   //for now only consider self species emission, S1 emits S2, S1==1
   Real emit_c = 0.0;
-  if (S1 > S2 && S2==1)
-    emit_c = absorb(S1,S2,C1,C1,T,tag1,tag2)/(Vatom) *exp(-energy(S1,C1,"binding")/Boltz_const/T);
+  if (S1 > S2 && S2 == 1)
+    emit_c = absorb(S1, S2, C1, C1, T, tag1, tag2) / _atomic_vol * std::exp(-energy(S1, C1, MaterialParameters::EType::BINDING)/ (_kB * T));
 
-  //unit:/s only emit point defect of the same species
+  // unit:/s only emit point defect of the same species
   return emit_c;
 }
 
-//dislocation sink rate k^2*Cj*Dj, return k^2*Dj in this function, where k^2= z*rho_d, P230/839 Was book
-Real GIron::disl_ksq(int S1, std::string C1, Real T, int tag) const {
-   Real bias = (! C1.compare("V"))? _v_bias : _i_bias;
-   return tag * diff(S1,C1,T) * _rho_d * bias;
+// dislocation sink rate k^2*Cj*Dj, return k^2*Dj in this function, where k^2= z*rho_d, P230/839 Was book
+Real
+GIron::disl_ksq(int S1, MaterialParameters::Species C1, Real T, bool mobile) const
+{
+  if (!mobile)
+    return 0.0;
+
+  const Real bias = C1 == MaterialParameters::Species::V ? _v_bias : _i_bias;
+  return diff(S1, C1, T) * _rho_d * bias;
 }

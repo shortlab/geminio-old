@@ -24,26 +24,23 @@ class BCCIronProperty : public GMaterialConstants
 public:
   BCCIronProperty(const InputParameters & parameters);
 
-  ~BCCIronProperty(){}
-  virtual void initialize();
-  virtual void execute();
-  virtual void finalize();
+  Real absorb(int,int, MaterialParameters::Species, MaterialParameters::Species, Real, int, int) const;
+  Real emit(int, int, Real, MaterialParameters::Species, MaterialParameters::Species, int, int) const;
+  Real disl_ksq(int, MaterialParameters::Species, Real, bool) const;
+  Real diff(int,  MaterialParameters::Species, Real) const;
 
-  Real absorb(int,int,std::string,std::string,Real,int,int) const;
-  Real emit(int,int,Real,std::string,std::string,int,int) const;
-  Real disl_ksq(int,std::string,Real,int=1) const;
-  Real energy(int,std::string,std::string) const;
-  Real D_prefactor(int,std::string) const;
-  Real diff(int, std::string,Real) const;
-  Real Ebinding(Real,const char*,Real=1) const;
+protected:
+  Real energy(int, MaterialParameters::Species, MaterialParameters::EType) const;
+  Real D_prefactor(int, MaterialParameters::Species) const;
+  Real Ebinding(Real, MaterialParameters::Species, Real=1) const;
 
-private:
   Real _rho_d;
   Real _i_bias;
   Real _v_bias;
+  const Real _scale;
 };
 
 template<>
 InputParameters validParams<BCCIronProperty>();
 
-#endif
+#endif // BCCIRONPROPERTY_H

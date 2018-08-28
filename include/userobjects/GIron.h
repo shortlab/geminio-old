@@ -19,20 +19,26 @@
 #include "GeneralUserObject.h"
 #include "GMaterialConstants.h"
 
+/**
+ * pure iron under neutron irradiation
+ * calculate: Fe irradiation,  Neutron-induced swelling and embrittlement of pure
+ * iron and pure nickel irradiated in the BN-350 and BOR-60 fast reactors
+ * parameters: Efficient simulation of kinetics of radiation induced defects: A cluster dynamics approach
+ */
 class GIron : public GMaterialConstants
 {
 public:
   GIron(const InputParameters & parameters);
 
-  Real absorb(int,int,std::string,std::string,Real,int,int) const;
-  Real emit(int,int,Real,std::string,std::string,int,int) const;
-  Real disl_ksq(int,std::string,Real,int=1) const;
-  Real energy(int,std::string,std::string) const;
-  Real D_prefactor(int,std::string) const;
-  Real diff(int, std::string,Real) const;
+  Real absorb(int, int, MaterialParameters::Species, MaterialParameters::Species, Real, int, int) const;
+  Real emit(int, int, Real, MaterialParameters::Species, MaterialParameters::Species, int, int) const;
+  Real disl_ksq(int, MaterialParameters::Species, Real, bool mobile = true) const;
+  Real energy(int, MaterialParameters::Species, MaterialParameters::EType) const;
+  Real D_prefactor(int, MaterialParameters::Species) const;
+  Real diff(int, MaterialParameters::Species, Real) const;
 };
 
 template<>
 InputParameters validParams<GIron>();
 
-#endif
+#endif // GIRON_H

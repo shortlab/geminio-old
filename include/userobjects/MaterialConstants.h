@@ -17,20 +17,24 @@
 #define MATERIALCONSTANTS_H
 
 #include "GeneralUserObject.h"
+#include "MaterialParameters.h"
 
 class MaterialConstants : public GeneralUserObject
 {
 public:
   MaterialConstants(const InputParameters & parameters);
 
-  virtual void initialize();
-  virtual void execute();
-  virtual void finalize();
+  virtual void initialize() {}
+  virtual void execute() {}
+  virtual void finalize() {}
 
-  virtual Real absorb(int,int,std::string,std::string,Real,int,int) const;
-  virtual Real emit(int,int,Real,std::string,std::string,int,int) const;
-  virtual Real disl_ksq(int,std::string,Real,int=1) const;//1 denotes mobile
-  virtual Real diff(int,std::string,Real) const;
+  virtual Real absorb(int, int, MaterialParameters::Species, MaterialParameters::Species, Real, int, int) const = 0;
+  virtual Real emit(int, int, Real, MaterialParameters::Species, MaterialParameters::Species, int, int) const = 0;
+  virtual Real disl_ksq(int, MaterialParameters::Species, Real, bool) const = 0;
+  virtual Real diff(int, MaterialParameters::Species, Real) const = 0;
+
+protected:
+  const Real _kB;
 };
 
 template<>

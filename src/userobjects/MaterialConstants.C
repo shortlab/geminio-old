@@ -15,8 +15,6 @@
 #include "MooseMesh.h"
 #include "MaterialConstants.h"
 
-registerMooseObject("GeminioApp", MaterialConstants);
-
 template<>
 InputParameters validParams<MaterialConstants>()
 {
@@ -26,44 +24,7 @@ InputParameters validParams<MaterialConstants>()
 }
 
 MaterialConstants::MaterialConstants(const InputParameters & parameters)
-  : GeneralUserObject(parameters)
+  : GeneralUserObject(parameters),
+    _kB(MaterialParameters::kB)
 {
-}
-
-void MaterialConstants::initialize()
-{
-}
-
-void MaterialConstants::execute()
-{
-}
-
-void MaterialConstants::finalize()
-{
-}
-
-Real
-MaterialConstants::absorb(int /*a*/,int /*b*/, std::string /*str1*/, std::string /*str2*/, Real /*cc*/, int /*dd*/, int /*e*/) const
-{
-  // need overwrite
-  return 0.0;
-}
-
-Real
-MaterialConstants::emit(int /*a*/,int /*b*/, Real /*c*/, std::string /*str1*/, std::string /*str2*/, int /*cc*/, int /*d*/) const
-{
-  // need overwrite
-  return 0.0;
-}
-
-Real MaterialConstants::disl_ksq(int /*a*/, std::string /*str1*/, Real /*cc*/, int /*d*/) const
-{
-  // need overwrite
-  return 0.0;
-}
-
-Real MaterialConstants::diff(int /*a*/, std::string /*str1*/, Real /*cc*/) const
-{
-  // need overwrite
-  return 0.0;
 }

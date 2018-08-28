@@ -5,7 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-
 #ifndef GGROUP_H
 #define GGROUP_H
 
@@ -24,6 +23,9 @@ InputParameters validParams<GGroup>();
  * Saturation of a phase as a function of
  * effective saturation of that phase,
  * and its derivatives wrt effective saturation
+ *
+ * make pair to loop up all the group constants   '+': vacancy; '-': intersitial
+ * calculate group constant based on hypothetical shape functions
  */
 class GGroup : public GeneralUserObject
 {
@@ -33,29 +35,34 @@ public:
 
   void initialize();
   void execute();
-  void finalize();
+  void finalize() {}
 
   void setGroupScheme();
   void updateGroupScheme();
   int CurrentGroupV(int) const;
   int CurrentGroupI(int) const;
+  
+  Real getAtomicVol() const { return _atomic_vol; }
 
-  Real _emit(int) const;//return kth group constant based on single shape function
-  Real _disl(int) const;//return dislocation sink strenght based on shape function
-  Real _diff(int) const;//return diffusion coefficient based on shape function
-  Real _absorb(int,int) const;//return kth,jth group constant based on double shape functions
+  /// return kth group constant based on single shape function
+  Real _emit(int) const;
+  /// return dislocation sink strenght based on shape function
+  Real _disl(int) const;
+  /// return diffusion coefficient based on shape function
+  Real _diff(int) const;
+  /// return kth,jth group constant based on double shape functions
+  Real _absorb(int, int) const;
 
   std::vector<int> GroupScheme_v;
   std::vector<int> GroupScheme_i;
-  Real* GroupScheme_v_sq;//dispersion
-  Real* GroupScheme_i_sq;//dispersion
+  Real* GroupScheme_v_sq; //dispersion
+  Real* GroupScheme_i_sq; //dispersion
   Real* GroupScheme_v_avg;//group avg
   Real* GroupScheme_i_avg;//group avg
-  int* GroupScheme_v_del;//group del
-  int* GroupScheme_i_del;//group del
-  Real _atomic_vol;
-
-
+  int* GroupScheme_v_del; //group del
+  /// group del
+  int* GroupScheme_i_del; 
+  
 protected:
   MooseEnum _GroupScheme;
   Real _dr_coef;
@@ -70,11 +77,13 @@ protected:
   Real _T;
   Function * const _T_func;
   bool _update;
-//  Real* _emit_array;//total _Ng_v + _Ng_i
-//  Real** _absorb__matrix;//(_Ng_v+_Ng_i)xtotal_no_of_mobile_species
+  // Real* _emit_array;//total _Ng_v + _Ng_i
+  // Real** _absorb__matrix;//(_Ng_v+_Ng_i)xtotal_no_of_mobile_species
   bool _has_material;
   const GMaterialConstants * const _material;
-  Point dummy;
+  Point _dummy;
+  
+  Real _atomic_vol;
 };
 
-#endif // 
+#endif // GGROUP_H
