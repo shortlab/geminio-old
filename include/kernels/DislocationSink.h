@@ -20,31 +20,18 @@
 //Forward Declarations
 class DislocationSink;
 
-/**
- * validParams returns the parameters that this Kernel accepts / needs
- * The actual body of the function MUST be in the .C file.
- */
 template<>
 InputParameters validParams<DislocationSink>();
 
 class DislocationSink : public Kernel
 {
 public:
-
-  DislocationSink(const 
-                   InputParameters & parameters);
+  DislocationSink(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
- // virtual Real computeQpOffDiagJacobian(unsigned int jvar);
-
-
-  /**
-   * This MooseArray will hold the reference we need to our
-   * material property from the Material class
-   */
 
   //std::string _prop_name_D;
   //const MaterialProperty<Real> & _D_species;
@@ -55,6 +42,6 @@ protected:
   Real _rho_disl;
   Real _dislocation_core_size;
   Real _coef;
-
 };
-#endif //DISLOCATIONSINK_H
+
+#endif // DISLOCATIONSINK_H

@@ -13,6 +13,7 @@
 /****************************************************************/
 
 #include "UserObjectSingleVariable.h"
+#include "GeminioUtils.h"
 
 registerMooseObject("GeminioApp", UserObjectSingleVariable);
 
@@ -23,8 +24,8 @@ InputParameters validParams<UserObjectSingleVariable>()
   params.addRequiredParam<UserObjectName>("user_object","the name of user object providing group constant");
   params.addRequiredParam<std::string>("call_function","map to function in the userobject");
   params.addCoupledVar("secondVar","the second variable which will probably be used in kernel");
-  params.addParam<Real>("coeff",1,"the coefficent before the product of these two variables");
-  
+  params.addParam<Real>("coeff",1,"the coefficient before the product of these two variables");
+
   return params;
 }
 
@@ -41,20 +42,20 @@ UserObjectSingleVariable::UserObjectSingleVariable(const
 
   NonlinearVariableName cur_var_name = getParam<NonlinearVariableName>("variable");
   std::vector<VariableName> vars_names = getParam<std::vector<VariableName> >("secondVar");
-  if(n==1)
+  if (n == 1)
   {
-    groupNo = getGroupNumber(vars_names[0]);
-    for (unsigned int i=0; i < _v_vals.size(); ++i)
+    groupNo = GeminioUtils::getGroupNumber(vars_names[0]);
+    for (unsigned int i = 0; i < _v_vals.size(); ++i)
     {
       _vars[i] = coupled("secondVar", i);
       _v_vals[i] = &coupledValue("secondVar", i);
     }
-//  printf("coupled var num : %d\n",_v_vals.size());
+    // printf("coupled var num : %d\n",_v_vals.size());
   }
   else
-    groupNo = getGroupNumber(cur_var_name);
-  
-  if(_call_fun.compare("emission") && _call_fun.compare("dislocation"))
+    groupNo = GeminioUtils::getGroupNumber(cur_var_name);
+
+  if (_call_fun.compare("emission") && _call_fun.compare("dislocation"))
     mooseError("Wrong call function name. Choices: emission, dislocation");
 }
 
@@ -62,53 +63,43 @@ Real
 UserObjectSingleVariable::computeQpResidual()
 {
   Real gc;
-  if(! _call_fun.compare("emission"))
-      gc = _gc._emit(groupNo);
+  if (!_call_fun.compare("emission"))
+    gc = _gc._emit(groupNo);
   else
-      gc = _gc._disl(groupNo);
+    gc = _gc._disl(groupNo);
 
   if (!_v_vals.size())
-    return _coeff * gc * _u[_qp]*_test[_i][_qp];
-  return _coeff * gc * (*_v_vals[0])[_qp]*_test[_i][_qp];
+    return _coeff * gc * _u[_qp] * _test[_i][_qp];
+
+  return _coeff * gc * (*_v_vals[0])[_qp] * _test[_i][_qp];
 }
 
 Real
 UserObjectSingleVariable::computeQpJacobian()
 {
   Real gc;
-  if(! _call_fun.compare("emission"))
-      gc = _gc._emit(groupNo);
+  if (!_call_fun.compare("emission"))
+    gc = _gc._emit(groupNo);
   else
-      gc = _gc._disl(groupNo);
+    gc = _gc._disl(groupNo);
+
   if (!_v_vals.size())
-    return _coeff * gc * _phi[_j][_qp]*_test[_i][_qp];
+    return _coeff * gc * _phi[_j][_qp] * _test[_i][_qp];
+
   return 0.0;
 }
 
-Real 
-UserObjectSingleVariable::computeQpOffDiagJacobian(unsigned int jvar){
-    Real gc;
-    if(! _call_fun.compare("emission"))
-        gc = _gc._emit(groupNo);
-    else
-        gc = _gc._disl(groupNo);
-
-    if (_v_vals.size()==1 && jvar == _vars[0])
-      return _coeff * gc * _phi[_j][_qp]*_test[_i][_qp];
-    return 0.0;
-}
-
-
-int
-UserObjectSingleVariable::getGroupNumber(std::string str)
+Real
+UserObjectSingleVariable::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  int len=str.length(),i=len;
-  while(std::isdigit(str[i-1])) i--;
-  int no = std::atoi((str.substr(i)).c_str());
-  while(i>=0){
-      i--;
-      if(str[i]=='v'){no = no;break;}
-      if(str[i]=='i'){no = -no;break;}
-  }
-  return no;
+  Real gc;
+  if (!_call_fun.compare("emission"))
+    gc = _gc._emit(groupNo);
+  else
+    gc = _gc._disl(groupNo);
+
+  if (_v_vals.size() == 1 && jvar == _vars[0])
+    return _coeff * gc * _phi[_j][_qp]*_test[_i][_qp];
+
+  return 0.0;
 }

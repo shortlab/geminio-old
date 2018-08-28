@@ -27,9 +27,7 @@ InputParameters validParams<SingleVariable>();
 class SingleVariable : public Kernel
 {
 public:
-  
-  SingleVariable(const 
-                            InputParameters & parameters);
+  SingleVariable(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
@@ -37,9 +35,9 @@ protected:
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
 private:
-  Real  _coeff;
+  Real _coeff;
   std::vector<unsigned int> _vars;
-
   std::vector<const VariableValue *> _v_vals;
 };
-#endif 
+
+#endif // SINGLEVARIABLE_H

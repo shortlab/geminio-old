@@ -27,18 +27,16 @@ InputParameters validParams<UserObjectDiffusion>();
 class UserObjectDiffusion : public Diffusion
 {
 public:
-  
-  UserObjectDiffusion(const 
-                            InputParameters & parameters);
+  UserObjectDiffusion(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
-  int getGroupNumber(std::string);
 
 private:
   Real _coeff;
   const GroupConstant & _gc;
   int groupNo;
 };
-#endif 
+
+#endif // USEROBJECTDIFFUSION_H

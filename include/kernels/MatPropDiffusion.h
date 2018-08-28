@@ -20,33 +20,20 @@
 //Forward Declarations
 class MatPropDiffusion;
 
-/**
- * validParams returns the parameters that this Kernel accepts / needs
- * The actual body of the function MUST be in the .C file.
- */
 template<>
 InputParameters validParams<MatPropDiffusion>();
 
 class MatPropDiffusion : public Diffusion
 {
 public:
-
-  MatPropDiffusion(const 
-                   InputParameters & parameters);
+  MatPropDiffusion(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
 
-  /**
-   * This MooseArray will hold the reference we need to our
-   * material property from the Material class
-   */
-
-// This is an abstracted way to get different diffusivities, calculated by materials, into this kernel
-
   std::string _prop_name;
   const MaterialProperty<Real> & _D_species;
-
 };
-#endif //MATPROPDIFFUSION_H
+
+#endif // MATPROPDIFFUSION_H

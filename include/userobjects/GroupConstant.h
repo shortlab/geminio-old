@@ -21,7 +21,7 @@ InputParameters validParams<GroupConstant>();
  * effective saturation of that phase,
  * and its derivatives wrt effective saturation
  *
- * make pair to loop up all the group constants   '+': vacancy; '-': intersitial
+ * make pair to loop up all the group constants   '+': vacancy; '-': interstitial
  * calculate group constant based on hypothetical shape functions
  */
 class GroupConstant : public GeneralUserObject

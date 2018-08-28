@@ -27,23 +27,20 @@ InputParameters validParams<UserObjectSingleVariable>();
 class UserObjectSingleVariable : public Kernel
 {
 public:
-  
-  UserObjectSingleVariable(const 
-                            InputParameters & parameters);
+  UserObjectSingleVariable(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
-  int getGroupNumber(std::string);
 
 private:
-
   const GroupConstant & _gc;
   std::string _call_fun;
-  Real  _coeff;
+  Real _coeff;
   std::vector<unsigned int> _vars;
   std::vector<const VariableValue *> _v_vals;
   int groupNo;
 };
-#endif 
+
+#endif // USEROBJECTSINGLEVARIABLE_H

@@ -32,7 +32,6 @@ public:
 
 protected:
   virtual Real computeQpOffDiagJacobian(unsigned int /*jvar*/);
-  int getGroupNumber(std::string);
 
 protected:
   unsigned int _number_v;

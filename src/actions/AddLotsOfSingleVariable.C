@@ -207,7 +207,7 @@ AddLotsOfSingleVariable::act()
     std::string var_name_v = name() +"v"+ Moose::stringify(cur_num);
     InputParameters params = _factory.getValidParams("SingleVariable");
     params.set<NonlinearVariableName>("variable") = var_name_v;
-    params.set<Real>("coeff") = emit_coef;//the sum of all emission coefficent from current size to other sizes
+    params.set<Real>("coeff") = emit_coef;//the sum of all emission coefficient from current size to other sizes
     _problem->addKernel("SingleVariable", "SingleV_" + var_name_v+Moose::stringify(counter), params);
     printf("add SingleVariable: %s, coef: %lf\n",var_name_v.c_str(),emit_coef);
    //other sizes to current size if mobile
@@ -220,9 +220,9 @@ AddLotsOfSingleVariable::act()
           params0.set<NonlinearVariableName>("variable") = var_name_v;
           params0.set<std::vector<VariableName> > ("secondVar").push_back(var_name_v2);
           if(2*cur_num == i)//Real
-            params0.set<Real>("coeff") = -2*vv[(i-1)*number_v+cur_num-1];//emission coefficent from larger size to current size; gain should be negative in kernel
+            params0.set<Real>("coeff") = -2*vv[(i-1)*number_v+cur_num-1];//emission coefficient from larger size to current size; gain should be negative in kernel
           else
-            params0.set<Real>("coeff") = -vv[(i-1)*number_v+cur_num-1];//emission coefficent from larger size to current size; gain should be negative in kernel
+            params0.set<Real>("coeff") = -vv[(i-1)*number_v+cur_num-1];//emission coefficient from larger size to current size; gain should be negative in kernel
           _problem->addKernel("SingleVariable", "SingleV_" + var_name_v + Moose::stringify(counter), params0);
           printf("add SingleVariable: %s (%s) , coef: %lf\n",var_name_v.c_str(),var_name_v2.c_str(),-vv[(i-1)*number_v+cur_num-1]);
       }
@@ -241,7 +241,7 @@ AddLotsOfSingleVariable::act()
     std::string var_name_i = name() +"i"+ Moose::stringify(cur_num);
     InputParameters params = _factory.getValidParams("SingleVariable");
     params.set<NonlinearVariableName>("variable") = var_name_i;
-    params.set<Real>("coeff") = emit_coef;//Should be the sum of all emission coefficent from current size to other sizes
+    params.set<Real>("coeff") = emit_coef;//Should be the sum of all emission coefficient from current size to other sizes
     _problem->addKernel("SingleVariable", "SingleV_" + var_name_i + Moose::stringify(counter), params);
     printf("add SingleVariable: %s, coef: %lf\n",var_name_i.c_str(),emit_coef);
     if (std::find( i_size.begin(),i_size.end(),cur_num) != i_size.end())//mobile
@@ -253,9 +253,9 @@ AddLotsOfSingleVariable::act()
           params0.set<NonlinearVariableName>("variable") = var_name_i;
           params0.set<std::vector<VariableName> > ("secondVar").push_back(var_name_v2);
           if(cur_num*2 == i)//Real
-            params0.set<Real>("coeff") = -2*ii[(i-1)*number_i+cur_num-1];//emission coefficent from larger sizes to current size; gain should be negative in kernel
+            params0.set<Real>("coeff") = -2*ii[(i-1)*number_i+cur_num-1];//emission coefficient from larger sizes to current size; gain should be negative in kernel
           else
-            params0.set<Real>("coeff") = -ii[(i-1)*number_i+cur_num-1];//emission coefficent from larger sizes to current size; gain should be negative in kernel
+            params0.set<Real>("coeff") = -ii[(i-1)*number_i+cur_num-1];//emission coefficient from larger sizes to current size; gain should be negative in kernel
           _problem->addKernel("SingleVariable", "SingleV_" + var_name_i+ Moose::stringify(counter), params0);
           printf("add SingleVariable: %s (%s) , coef: %lf\n",var_name_i.c_str(),var_name_v2.c_str(),-ii[(i-1)*number_i+cur_num-1]);
       }

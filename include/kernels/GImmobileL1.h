@@ -21,7 +21,6 @@
 //Forward Declarations
 class GImmobileL1;
 
-
 template<>
 InputParameters validParams<GImmobileL1>();
 

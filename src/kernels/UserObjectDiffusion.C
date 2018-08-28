@@ -13,6 +13,7 @@
 /****************************************************************/
 
 #include "UserObjectDiffusion.h"
+#include "GeminioUtils.h"
 
 registerMooseObject("GeminioApp", UserObjectDiffusion);
 
@@ -20,8 +21,8 @@ template<>
 InputParameters validParams<UserObjectDiffusion>()
 {
   InputParameters params = validParams<Diffusion>();
-  params.addRequiredParam<UserObjectName>("user_object","the name of user object providing group constant");
-  params.addParam<Real>("coeff",1.0,"coefficient");
+  params.addRequiredParam<UserObjectName>("user_object", "the name of user object providing group constant");
+  params.addParam<Real>("coeff", 1.0, "coefficient");
   return params;
 }
 
@@ -32,7 +33,7 @@ UserObjectDiffusion::UserObjectDiffusion(const
      _gc(getUserObject<GroupConstant>("user_object"))
 {
   NonlinearVariableName cur_var_name = getParam<NonlinearVariableName>("variable");
-  groupNo = getGroupNumber(cur_var_name);
+  groupNo = GeminioUtils::getGroupNumber(cur_var_name);
 }
 
 Real
@@ -47,19 +48,4 @@ UserObjectDiffusion::computeQpJacobian()
 {
   Real gc = _gc._diff(groupNo);
   return  _coeff * gc * Diffusion::computeQpJacobian();
-}
-
-
-int
-UserObjectDiffusion::getGroupNumber(std::string str)
-{
-  int len=str.length(),i=len;
-  while(std::isdigit(str[i-1])) i--;
-  int no = std::atoi((str.substr(i)).c_str());
-  while(i>=0){
-      i--;
-      if(str[i]=='v'){no = no;break;}
-      if(str[i]=='i'){no = -no;break;}
-  }
-  return no;
 }

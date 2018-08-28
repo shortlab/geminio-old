@@ -20,34 +20,22 @@
 //Forward Declarations
 class DefectSink;
 
-/**
- * validParams returns the parameters that this Kernel accepts / needs
- * The actual body of the function MUST be in the .C file.
- */
 template<>
 InputParameters validParams<DefectSink>();
 
 class DefectSink : public Kernel
 {
 public:
-
-  DefectSink(const 
-                   InputParameters & parameters);
+  DefectSink(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
-//  virtual Real computeQpOffDiagJacobian(unsigned int jvar);
-
-  /**
-   * This MooseArray will hold the reference we need to our
-   * material property from the Material class
-   */
 
   const VariableValue & _sink_rate;
-//  const VariableValue & _sink_concentration;
+  // const VariableValue & _sink_concentration;
   const VariableValue & _defect_concentration_correction;
-//  unsigned int _other_defect_var;
-
+  // unsigned int _other_defect_var;
 };
-#endif //DEFECTSINK_H
+
+#endif // DEFECTSINK_H

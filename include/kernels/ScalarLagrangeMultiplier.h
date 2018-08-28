@@ -40,4 +40,4 @@ protected:
   VariableValue & _lambda;
 };
 
-#endif /* SCALARLAGRANGEMULTIPLIER_H */
+#endif // SCALARLAGRANGEMULTIPLIER_H

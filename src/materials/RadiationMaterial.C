@@ -13,6 +13,7 @@
 /****************************************************************/
 
 #include "RadiationMaterial.h"
+#include "MaterialParameters.h"
 
 registerMooseObject("GeminioApp", RadiationMaterial);
 
@@ -46,90 +47,72 @@ InputParameters validParams<RadiationMaterial>()
   params.addParam<Real>("AverageVoidRadiusInitial", 0.5, "Initial average void radius");
 
   // Many material properties scale with temperature (to be implemented later)
-//  params.addRequiredCoupledVar("temperature", "Temperature of the CRUD for viscosity calculation (water temperature)");
+  // params.addRequiredCoupledVar("temperature", "Temperature of the CRUD for viscosity calculation (water temperature)");
 
   return params;
 }
 
-RadiationMaterial::RadiationMaterial(const
-                           InputParameters & parameters)
-    :Material(parameters),
+RadiationMaterial::RadiationMaterial(const InputParameters & parameters)
+  : Material(parameters),
+    _constant_temperature(getParam<Real>("ConstantTemperature")),
+    _vacancy_D0(getParam<Real>("VacancyD0")),
+    _interstitial_D0(getParam<Real>("InterstitialD0")),
+    _vacancy_activation_energy(getParam<Real>("VacancyActivationEnergy")),
+    _interstitial_activation_energy(getParam<Real>("InterstitialActivationEnergy")),
+    _intracascade_survival(getParam<Real>("IntraCascadeSurvivalFraction")),
+    _vacancy_sink_density(getParam<Real>("VacancySinkDensity")),
+    _interstitial_sink_density(getParam<Real>("InterstitialSinkDensity")),
+    _vacancy_sink_strength(getParam<Real>("VacancySinkStrength")),
+    _interstitial_sink_strength(getParam<Real>("InterstitialSinkStrength")),
+    _recombination_efficiency(getParam<Real>("RecombinationEfficiency")),
+    // Get crystallographic parameters
+    _lattice_parameter(getParam<Real>("LatticeParameter")),
+    _dislocation_density_initial(getParam<Real>("DislocationDensityInitial")),
+    _average_void_radius_initial(getParam<Real>("AverageVoidRadiusInitial")),
+    // Declare material properties that kernels can use
+    _vacancy_diffusivity_matprop(declareProperty<Real>("VacancyDiffusivityMatProp")),
+    _interstitial_diffusivity_matprop(declareProperty<Real>("InterstitialDiffusivityMatProp")),
+    // Declare intracascade-related properties for kernel use
+    _intracascade_survival_matprop(declareProperty<Real>("IntracascadeSurvivalMatProp")),
+    // Declare material properties that are just the rate constants,
+    // so that they may be defined in the most logical place, within
+    // within the context of a single material.
+    _vacancy_sink_density_matprop(declareProperty<Real>("VacancySinkDensityMatProp")),
+    _interstitial_sink_density_matprop(declareProperty<Real>("InterstitialSinkDensityMatProp")),
+    _vacancy_sink_strength_matprop(declareProperty<Real>("VacancySinkStrengthMatProp")),
+    _interstitial_sink_strength_matprop(declareProperty<Real>("InterstitialSinkStrengthMatProp")),
+    _recombination_efficiency_matprop(declareProperty<Real>("RecombinationEfficiencyMatProp")),
 
-     // Get simple parameters from the input file
-     _constant_temperature(getParam<Real>("ConstantTemperature")),
+    _lattice_parameter_matprop(declareProperty<Real>("LatticeParameterMatProp")),
+    _atomic_volume_matprop(declareProperty<Real>("AtomicVolumeMatProp")),
+    _number_density_matprop(declareProperty<Real>("NumberDensityMatProp")),
+    _dislocation_density_matprop(declareProperty<Real>("DislocationDensityMatProp")),
+    _thermal_vacancy_concentration_matprop(declareProperty<Real>("ThermalVacancyConcentrationMatProp")),
+    _average_void_radius_matprop(declareProperty<Real>("AverageVoidRadiusMatProp")),
+    _system_temp(declareProperty<Real>("SystemTemperature"))
 
-     // Get defect diffusivity parameters from the input file
-     _vacancy_D0(getParam<Real>("VacancyD0")),
-     _interstitial_D0(getParam<Real>("InterstitialD0")),
-     _vacancy_activation_energy(getParam<Real>("VacancyActivationEnergy")),
-     _interstitial_activation_energy(getParam<Real>("InterstitialActivationEnergy")),
-
-     // Get defect diffusivity parameters from the input file
-     _intracascade_survival(getParam<Real>("IntraCascadeSurvivalFraction")),
-
-     // Get defect rate constant parameters from the input file
-     _vacancy_sink_density(getParam<Real>("VacancySinkDensity")),
-     _interstitial_sink_density(getParam<Real>("InterstitialSinkDensity")),
-     _vacancy_sink_strength(getParam<Real>("VacancySinkStrength")),
-     _interstitial_sink_strength(getParam<Real>("InterstitialSinkStrength")),
-     _recombination_efficiency(getParam<Real>("RecombinationEfficiency")),
-
-     // Get crystallographic parameters
-     _lattice_parameter(getParam<Real>("LatticeParameter")),
-     _dislocation_density_initial(getParam<Real>("DislocationDensityInitial")),
-     _average_void_radius_initial(getParam<Real>("AverageVoidRadiusInitial")),
-
-     // Declare material properties that kernels can use
-     _vacancy_diffusivity_matprop(declareProperty<Real>("VacancyDiffusivityMatProp")),
-     _interstitial_diffusivity_matprop(declareProperty<Real>("InterstitialDiffusivityMatProp")),
-
-     // Declare intracascade-related properties for kernel use
-     _intracascade_survival_matprop(declareProperty<Real>("IntracascadeSurvivalMatProp")),
-
-     // Declare material properties that are just the rate constants,
-     // so that they may be defined in the most logical place, within
-     // within the context of a single material.
-     _vacancy_sink_density_matprop(declareProperty<Real>("VacancySinkDensityMatProp")),
-     _interstitial_sink_density_matprop(declareProperty<Real>("InterstitialSinkDensityMatProp")),
-     _vacancy_sink_strength_matprop(declareProperty<Real>("VacancySinkStrengthMatProp")),
-     _interstitial_sink_strength_matprop(declareProperty<Real>("InterstitialSinkStrengthMatProp")),
-     _recombination_efficiency_matprop(declareProperty<Real>("RecombinationEfficiencyMatProp")),
-
-     _lattice_parameter_matprop(declareProperty<Real>("LatticeParameterMatProp")),
-     _atomic_volume_matprop(declareProperty<Real>("AtomicVolumeMatProp")),
-     _number_density_matprop(declareProperty<Real>("NumberDensityMatProp")),
-     _dislocation_density_matprop(declareProperty<Real>("DislocationDensityMatProp")),
-     _thermal_vacancy_concentration_matprop(declareProperty<Real>("ThermalVacancyConcentrationMatProp")),
-     _average_void_radius_matprop(declareProperty<Real>("AverageVoidRadiusMatProp")),
-     _system_temp(declareProperty<Real>("SystemTemperature"))
-
-     // Bring in any coupled variables needed to calculate material properties
-//     _T(coupledValue("temperature"))
-
+    // Bring in any coupled variables needed to calculate material properties
+    // _T(coupledValue("temperature"))
 {
 }
 
 void
 RadiationMaterial::computeQpProperties()
 {
-  Real _T = _constant_temperature;  // Comment to allow variable temperatures
+  // Comment to allow variable temperatures
+  Real _T = _constant_temperature;  
   _system_temp[_qp] = _T;
 
-  Real _boltzmann_constant = 8.62e-5;  // In eV-K units
-
-  Real _N_avogadro = 6.02e23;  // Number of atoms per mole
-
-  Real _Fe_density = 7.85;  // in g/cc
-
-  Real _Fe_molar_mass = 55.85;  // in g/mol
+  Real N_avogadro = 6.02e23;  // Number of atoms per mole
+  Real Fe_density = 7.85;  // in g/cc
+  Real Fe_molar_mass = 55.85;  // in g/mol
 
   _vacancy_diffusivity_matprop[_qp] = _vacancy_D0 *
-    std::exp((-_vacancy_activation_energy)
-     / (_boltzmann_constant * _T));
+    std::exp(-_vacancy_activation_energy / (MaterialParameters::kB * _T));
 
   _interstitial_diffusivity_matprop[_qp] = _interstitial_D0 *
-    std::exp((-_interstitial_activation_energy)
-     / (_boltzmann_constant * _T));
+    std::exp(-_interstitial_activation_energy / (MaterialParameters::kB * _T));
+    
   //printf("vacancy_diffusivity: %lf\n",  _vacancy_diffusivity_matprop[_qp]); 
   //printf("interstitial_diffusivity: %lf\n",  _interstitial_diffusivity_matprop[_qp]); 
   _intracascade_survival_matprop[_qp] = _intracascade_survival;
@@ -146,9 +129,9 @@ RadiationMaterial::computeQpProperties()
                                 + (2.68634e-7 * _T)
                                 +  0.0116954;
 
-  _number_density_matprop[_qp] =   (_Fe_density / 1e21)  // Density in g/nm3
-                                 / _Fe_molar_mass        // Gives mol/nm3
-                                 * _N_avogadro;          // Gives atoms/nm3
+  _number_density_matprop[_qp] =   (Fe_density / 1e21)  // Density in g/nm3
+                                 / Fe_molar_mass        // Gives mol/nm3
+                                 * N_avogadro;          // Gives atoms/nm3
 
   _dislocation_density_matprop[_qp] = _dislocation_density_initial;
   _average_void_radius_matprop[_qp] = _average_void_radius_initial;

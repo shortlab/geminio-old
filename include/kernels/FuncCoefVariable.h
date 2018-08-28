@@ -23,11 +23,7 @@ class Function;
 template<>
 InputParameters validParams<FuncCoefVariable>();
 
-/**
- * A kernel for testing the MooseParsedFunctionInterface
- */
-class FuncCoefVariable :
-  public Kernel
+class FuncCoefVariable : public Kernel
 {
 public:
   FuncCoefVariable(const InputParameters & parameters);

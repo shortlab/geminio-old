@@ -141,7 +141,7 @@ GGroup::setGroupScheme()
         GroupScheme_v[i] -= 1;
     }
 
-    // append intersitial group scheme
+    // append interstitial group scheme
     if (_Ng_i > 0)
     {
       // 1. 2. 3. each as a group, [1 2) [2 3) [3 4)

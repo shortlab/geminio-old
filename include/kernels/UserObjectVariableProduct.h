@@ -28,23 +28,21 @@ InputParameters validParams<UserObjectVariableProduct>();
 class UserObjectVariableProduct : public Kernel
 {
 public:
-  
-  UserObjectVariableProduct(const 
-                            InputParameters & parameters);
+  UserObjectVariableProduct(const InputParameters & parameters);
   
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
-  int getGroupNumber(std::string);
 
 private:
   const GroupConstant & _gc;
-  Real  _coeff;
+  Real _coeff;
   std::vector<unsigned int> _vars;
   /// Coupled primary species concentrations.
   std::vector<const VariableValue *> _v_vals;
-//  std::vector<std::string> _var_names;
-  int groupa,groupb;
+  // std::vector<std::string> _var_names;
+  int groupa, groupb;
 };
-#endif 
+
+#endif // USEROBJECTVARIABLEPRODUCT_H

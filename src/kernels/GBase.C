@@ -14,6 +14,7 @@
 
 #include "GBase.h"
 #include "Conversion.h"
+#include "GeminioUtils.h"
 
 template<>
 InputParameters validParams<GBase>()
@@ -38,7 +39,7 @@ GBase::GBase(const InputParameters & parameters)
      _gc(getUserObject<GGroup>("user_object"))
 {
   NonlinearVariableName cur_var_name = getParam<NonlinearVariableName>("variable");
-  _cur_size = getGroupNumber(cur_var_name);
+  _cur_size = GeminioUtils::getGroupNumber(cur_var_name);
 
   auto num_v_coupled = coupledComponents("coupled_v_vars");
   _no_v_vars.resize(num_v_coupled);
@@ -73,25 +74,4 @@ Real
 GBase::computeQpOffDiagJacobian(unsigned int /*jvar*/)
 {
   return 0.0;
-}
-
-int
-GBase::getGroupNumber(std::string str)
-{
-  int len = str.length(), i = len;
-  while (std::isdigit(str[i-1])) i--;
-
-  int no = std::atoi((str.substr(i)).c_str());
-  while (i>=0){
-    i--;
-    if (str[i]=='v')
-      break;
-    if (str[i]=='i')
-    {
-      no = -no;
-      break;
-    }
-  }
-
-  return no;
 }

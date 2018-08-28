@@ -26,7 +26,7 @@ InputParameters validParams<AddMobileDefects>()
   params.addRequiredParam<unsigned int>("number_v", "The number of vacancy variables to add");
   params.addRequiredParam<unsigned int>("number_i", "The number of interstitial variables to add");
   params.addRequiredParam<unsigned int>("max_mobile_v", "maximum size of mobile vacancy cluster");
-  params.addRequiredParam<unsigned int>("max_mobile_i", "maximum size of mobile intersitial cluster");
+  params.addRequiredParam<unsigned int>("max_mobile_i", "maximum size of mobile interstitial cluster");
   params.addRequiredParam<UserObjectName>("group_constant", "User object holding the grouping method parameterization");
   params.addParam<Real>("dislocation",0.0,"dislocation density");
   params.addParam<std::vector<Real> >("disl_mobile_v", "A vector of dislocation bias for mobile species");

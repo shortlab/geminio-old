@@ -22,7 +22,7 @@ InputParameters validParams<BCCIronProperty>()
 {
   InputParameters params = validParams<GMaterialConstants>();
   params.addRequiredParam<Real>("dislocation", "dislocation density in #/um^2");
-  params.addParam<Real>("i_disl_bias", 1.1, "dislocation bias for intersitials");
+  params.addParam<Real>("i_disl_bias", 1.1, "dislocation bias for interstitials");
   params.addParam<Real>("v_disl_bias", 1.0, "dislocation bias for vacancies");
 
   // bcc iron atom volume um^3

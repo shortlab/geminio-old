@@ -132,7 +132,7 @@ GMobile::computeQpResidual()
     }
 
     //ii reaction loss(-)
-    for(int i=1;i <= _max_i-cur_size;i++){//garantee the largest size doesn't exceed _number_v
+    for(int i=1;i <= _max_i-cur_size;i++){//guarantee the largest size doesn't exceed _number_v
       //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,-i);
       conc = getConcBySize(-i);
       res_sum += conc *_u[_qp]*_gc._absorb(-cur_size,-i);
@@ -204,7 +204,7 @@ GMobile::computeQpJacobian()
     }
 
     //vv reaction loss(-)
-    for(int i=1;i <= _max_v-cur_size;i++){//garantee the largest size doesn't exceed _number_v
+    for(int i=1;i <= _max_v-cur_size;i++){//guarantee the largest size doesn't exceed _number_v
       conc = getConcBySize(i);
       jac_sum += conc *_gc._absorb(cur_size,i);//10 is test
     }

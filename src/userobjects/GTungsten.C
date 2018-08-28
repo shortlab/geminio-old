@@ -18,7 +18,7 @@ InputParameters validParams<GTungsten>()
 GTungsten::GTungsten(const InputParameters & parameters)
   : GMaterialConstants(parameters),
     _burgers(2.7366e-4), // burgers vector (um) (sqrt(3)/2 * a0)
-    _rvi(0.65e-3),       // vacancy - intersitial reaction distance (um))
+    _rvi(0.65e-3),       // vacancy - interstitial reaction distance (um))
     _Ev_formation(3.23), // vacancy formation energy eV
     _Ei_formation(9.96), // interstitial formation energy eV
     _Evb2(-0.1),         // binding energy for vacancy cluster size 2
@@ -272,7 +272,7 @@ GTungsten::emit(int S1, int S2, Real T, MaterialParameters::Species C1, Material
 {
   //for now only consider self species emission, S1 emits S2, S1==1
   if (C1 == MaterialParameters::Species::I)
-    //intersitial cluster doesn't emit.
+    //interstitial cluster doesn't emit.
     return 0.0;
 
   Real emit_c = 0.0;
