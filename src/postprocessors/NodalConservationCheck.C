@@ -12,8 +12,6 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-///////////////////////// Check to total number of defects in terms of point defect /////////////
-
 #include "NodalConservationCheck.h"
 #include "MooseMesh.h"
 #include "SubProblem.h"
@@ -29,8 +27,8 @@ InputParameters validParams<NodalConservationCheck>()
 {
   InputParameters params = validParams<GeneralPostprocessor>();
   params.addRequiredParam<unsigned int>("nodeid", "The ID of the node where we monitor");
-  params.addRequiredParam<std::string>("var_prefix","The prefix string of variables (in front of number)");
-  params.addRequiredParam<std::vector<int> >("size_range","The number of vacancy variables to solve");
+  params.addRequiredParam<std::string>("var_prefix", "The prefix string of variables (in front of number)");
+  params.addRequiredParam<std::vector<int> >("size_range", "The number of vacancy variables to solve");
   params.addParam<Real>("scale_factor", 1, "A scale factor to be applied to the variable");
   return params;
 }
@@ -48,29 +46,35 @@ NodalConservationCheck::NodalConservationCheck(const InputParameters & parameter
   _mesh.errorIfDistributedMesh("NodalConservationCheck");
 
   if (_node_ptr == nullptr)
-    mooseError("Node #", getParam<unsigned int>("nodeid"), " specified in '", name(), "' not found in the mesh!");
-  if (_size_range.size()!=2 || _size_range[1]<_size_range[0]) //neither provided or both provided is wrong
-    mooseError("Defect size range is not provided correctly, double check!");
+    paramError("nodeid", "Node #", getParam<unsigned int>("nodeid"), " not found in the mesh!");
 
+  // neither provided or both provided is wrong
+  if (_size_range.size() != 2 || _size_range[1] < _size_range[0])
+    mooseError("Defect size range is not provided correctly, double check!");
 }
 
 Real
 NodalConservationCheck::getValue()
 {
   Real total = 0.0;
-  Real value = 0.0;
   int max_num = _size_range[1];
-  for(int i=_size_range[0];i<=max_num;i++){
-      value = 0.0;
-      std::string _var_name = _var_prefix + Moose::stringify(i);
-      if (_node_ptr->processor_id() == processor_id())
-        value = _subproblem.getVariable(_tid, _var_name).getNodalValue(*_node_ptr) * i;//multiplied by defect size 
-    
-      gatherSum(value);//broadcast one value to other processors with previous zeros
-      
-      total += value;
-   } 
-  
+
+  Real value;
+  for (int i = _size_range[0]; i <= max_num; ++i)
+  {
+    value = 0.0;
+    std::string _var_name = _var_prefix + Moose::stringify(i);
+    if (_node_ptr->processor_id() == processor_id())
+    {
+      const Real size = _subproblem.getVariable(_tid, _var_name).getNodalValue(*_node_ptr);
+      value = size * i;
+    }
+
+    // broadcast one value to other processors with previous zeros
+    gatherSum(value);
+
+    total += value;
+  }
+
   return _scale_factor * total;
 }
-

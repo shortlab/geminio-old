@@ -36,7 +36,7 @@ InputParameters validParams<GGroup>()
   return params;
 }
 
-GGroup::GGroup(const InputParameters & parameters) 
+GGroup::GGroup(const InputParameters & parameters)
   : GeneralUserObject(parameters),
     _GroupScheme(getParam<MooseEnum>("GroupScheme")),
     _dr_coef(getParam<Real>("dr_coef")),
@@ -55,7 +55,7 @@ GGroup::GGroup(const InputParameters & parameters)
     _material(_has_material ? &getUserObject<GMaterialConstants>("material") : nullptr),
     _atomic_vol(_material ? _material->getAtomicVol() : 0.0) // TODO: right now material MUST be provided!!!
 {
- 
+
   // test input correctness
   if (!isParamValid("temperature") && !_T_func)
     mooseError("Temperature should be provided");
@@ -65,7 +65,7 @@ GGroup::GGroup(const InputParameters & parameters)
     mooseError("max_single_group should be smaller than total groups");
   if (_i_size > 0 && _single_i_group < _i_size)
     mooseError("max_single_group should be larger than the largest mobile size, there");
-  
+
   GroupScheme_v.reserve(_Ng_v+1);
   GroupScheme_i.reserve(_Ng_i+1);
 
@@ -116,8 +116,9 @@ GGroup::setGroupScheme()
     if (_Ng_v > 0)
     {
       // 1. 2. 3. each as a group, [1 2) [2 3) [3 4)
-      int single_v_group = _single_v_group+1;
-      for (int i=1;i<=single_v_group;i++){
+      int single_v_group = _single_v_group + 1;
+      for (int i=1;i<=single_v_group;i++)
+      {
         GroupScheme_v.push_back(i);
         // printf("add %d\n",GroupScheme_v.back());
       }
@@ -131,11 +132,11 @@ GGroup::setGroupScheme()
           GroupScheme_v.push_back(next_size);
         }
       }
-      if (GroupScheme_v.back() != _num_v) 
+      if (GroupScheme_v.back() != _num_v)
         GroupScheme_v[GroupScheme_v.size()-1] = _num_v;
-      if ((int)(GroupScheme_v.size()) != _Ng_v+1)
+      if ((int)(GroupScheme_v.size()) != _Ng_v + 1)
         mooseError("Group number ", GroupScheme_v.size(), " not correct");
-      
+
       // shift to left by one (x1, x2],consistent with Golubov's paper
       for (int i = 0; i < _Ng_v + 1; ++i)
         GroupScheme_v[i] -= 1;
@@ -149,7 +150,7 @@ GGroup::setGroupScheme()
       for (int i = 1; i <= single_i_group; ++i)
         // make negative to distinguish from vacancy type
         GroupScheme_i.push_back(i);
-      
+
       if (_single_i_group < _Ng_i)
       {
         Real interval = 1.0 * (_num_i - single_i_group) / (_Ng_i - _single_i_group);
@@ -159,11 +160,11 @@ GGroup::setGroupScheme()
           GroupScheme_i.push_back(next_size);
         }
       }
-      if (GroupScheme_i.back() != _num_i) 
+      if (GroupScheme_i.back() != _num_i)
         GroupScheme_i[GroupScheme_i.size()-1] = _num_i;
       if ((int)(GroupScheme_i.size()) != _Ng_i + 1)
         mooseError("Group number ", GroupScheme_i.size(), " not correct");
-        
+
       //shift to left by one (x1, x2],consistent with Golubov's paper
       for (int i = 0; i < _Ng_i + 1; ++i)
         GroupScheme_i[i] -= 1;
@@ -211,22 +212,22 @@ GGroup::setGroupScheme()
   for (int i = 1; i <= _Ng_v; ++i)
   {
     Real minu = 0.0, subt = 0.0;
-    del = GroupScheme_v[i]-GroupScheme_v[i-1];
+    del = GroupScheme_v[i] - GroupScheme_v[i-1];
     for (int j = GroupScheme_v[i-1]+1; j <= GroupScheme_v[i]; ++j)
     {
       minu += j * j;
       subt += j;
     }
     GroupScheme_v_sq[i-1] = (minu - subt * subt / del) / del;
-    GroupScheme_v_avg[i-1]= GroupScheme_v[i] - (del - 1) / 2.0;
+    GroupScheme_v_avg[i-1] = GroupScheme_v[i] - (del - 1) / 2.0;
     GroupScheme_v_del[i-1] = del;
-    //printf("scheme: %d %f %f %d \n",GroupScheme_v[i-1],GroupScheme_v_sq[i-1],GroupScheme_v_avg[i-1],GroupScheme_v_del[i-1]);
+    // printf("scheme: %d %f %f %d \n",GroupScheme_v[i-1],GroupScheme_v_sq[i-1],GroupScheme_v_avg[i-1],GroupScheme_v_del[i-1]);
   }
-  
+
   for (int i = 1; i <= _Ng_i; ++i)
   {
     Real minu = 0.0, subt = 0.0;
-    del = (GroupScheme_i[i])-(GroupScheme_i[i-1]);
+    del = GroupScheme_i[i] - GroupScheme_i[i-1];
     for (int j = GroupScheme_i[i-1] + 1; j <= GroupScheme_i[i]; ++j)
     {
       minu += j * j;
@@ -259,7 +260,7 @@ GGroup::execute()
 
 // [cr_start, cr_end)
 Real
-GGroup::_emit(int clustersize) const 
+GGroup::_emit(int clustersize) const
 {
   const auto species = clustersize > 0 ? MaterialParameters::Species::V : MaterialParameters::Species::I;
   // denote mobility
@@ -276,7 +277,7 @@ GGroup::_emit(int clustersize) const
   }
   Real T = _T_func ? _T_func->value(_t, _dummy) : _T;
   Real val = _material->emit((int)std::abs(clustersize), 1, T, species, species, tagi, 1);
-  //printf("emit of clustersize (%d): %f\n",clustersize, val);
+  // printf("emit of clustersize (%d): %f\n",clustersize, val);
   return val;
 }
 
@@ -284,24 +285,25 @@ Real
 GGroup::_disl(int clustersize) const //[cr_start, cr_end)
 {
   const auto species = clustersize > 0 ? MaterialParameters::Species::V:MaterialParameters::Species::I;
-  int tagi = 0;//denote mobility
+  // denote mobility
+  int tagi = 0;
   Real val = 0.0;
   Real T = _T_func ? _T_func->value(_t, _dummy) : _T;
   if (clustersize > 0)
   {
-    if (clustersize > _v_size) 
+    if (clustersize > _v_size)
       return 0.0;
     tagi = 1;
     val = _material->disl_ksq(clustersize, species, T, tagi);
   }
   else
   {
-    if (-clustersize > _i_size) 
+    if (-clustersize > _i_size)
       return 0.0;
     tagi = 1;
     val = _material->disl_ksq(-clustersize, species, T, tagi);
   }
-  //printf("dislocation of clustersize (%d): %f\n",clustersize, val);
+  // printf("dislocation of clustersize (%d): %f\n",clustersize, val);
   return val;
 }
 
@@ -309,29 +311,31 @@ Real
 GGroup::_diff(int clustersize) const //[cr_start, cr_end)
 {
   const auto species = clustersize > 0 ? MaterialParameters::Species::V:MaterialParameters::Species::I;
-  int tagi = 0;//denote mobility
+  // denote mobility
+  int tagi = 0;
   Real val = 0.0;
   Real T = _T_func? _T_func->value(_t, _dummy):_T;
   if (clustersize > 0)
   {
-    if (clustersize > _v_size) 
+    if (clustersize > _v_size)
       return 0.0;
     tagi = 1;
     val = _material->diff(clustersize, species, T);
   }
   else
   {
-    if (-clustersize > _i_size) 
+    if (-clustersize > _i_size)
       return 0.0;
     tagi = 1;
     val = _material->diff(clustersize, species, T);
   }
-  //printf("diffusion of clustersize (%d): %f\n",clustersize, val);
+  // printf("diffusion of clustersize (%d): %f\n",clustersize, val);
   return val;
 }
 
+// [ot_start, ot_end),[cr_start, cr_end)
 Real
-GGroup::_absorb(int clustersize1, int clustersize2) const //[ot_start, ot_end),[cr_start, cr_end)
+GGroup::_absorb(int clustersize1, int clustersize2) const
 {
   // Real val = 0.0;
   Real T = _T_func ? _T_func->value(_t, _dummy) : _T;
@@ -343,7 +347,7 @@ GGroup::_absorb(int clustersize1, int clustersize2) const //[ot_start, ot_end),[
   int flag;
   if (clustersize1 > 0 && clustersize2 > 0)
   {
-    //vv
+    // vv
     if (i <= _v_size)
       tagi = 1;
     if (j <= _v_size)
@@ -352,13 +356,13 @@ GGroup::_absorb(int clustersize1, int clustersize2) const //[ot_start, ot_end),[
     //printf("absorb v %d with v %d: %lf \n",i, j, _material->absorb(i, j, MaterialParameters::Species::V, MaterialParameters::Species::V, _T, tagi, tagj));//,absorb(i, j, MaterialParameters::Species::V, MaterialParameters::Species::V, _T, tagi, tagj));
     //return _material->absorb(i, j, MaterialParameters::Species::V, MaterialParameters::Species::V, _T, tagi, tagj);//absorption between i and j
 
-    //flag=0: i j immobile; flag=1: i mobile; flag=2: j mobile; flag=3: i j mobile
+    // flag=0: i j immobile; flag=1: i mobile; flag=2: j mobile; flag=3: i j mobile
     flag = tagi + 2 * tagj;
     return _material->absorbVV(i, j, flag, T);
   }
   else if (clustersize1 > 0 && clustersize2 < 0)
   {
-    //vi
+    // vi
     if (i <= _v_size)
       tagi = 1;
     if (j <= _i_size)
@@ -373,7 +377,7 @@ GGroup::_absorb(int clustersize1, int clustersize2) const //[ot_start, ot_end),[
   }
   else if (clustersize1 < 0 && clustersize2 > 0)
   {
-    //iv
+    // iv
     if (i <= _i_size)
       tagi = 1;
     if (j <= _v_size)
@@ -388,17 +392,17 @@ GGroup::_absorb(int clustersize1, int clustersize2) const //[ot_start, ot_end),[
   }
   else
   {
-    //ii
+    // ii
     if (i <= _i_size)
       tagi = 1;
     if (j <= _i_size)
       tagj = 1;
-      
+
     //printf("absorb i %d with i %d: %lf\n",i, j, _material->absorb(i, j, MaterialParameters::Species::I, MaterialParameters::Species::I, _T, tagi, tagj));
     //return _material->absorb(i, j, MaterialParameters::Species::I, MaterialParameters::Species::I, _T, tagi, tagj);//absorption between i and j
 
-    //flag=0: i j immobile; flag=1: i mobile; flag=2: j mobile; flag=3: i j mobile
-    flag = tagi + 2*tagj;
+    // flag=0: i j immobile; flag=1: i mobile; flag=2: j mobile; flag=3: i j mobile
+    flag = tagi + 2 * tagj;
     return _material->absorbII(i, j, flag, T);
   }
 }

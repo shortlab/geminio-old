@@ -45,16 +45,16 @@ GeminioAddVariableAction::GeminioAddVariableAction(const InputParameters & param
     case 0:
       _bc_name = "NeumannBC";
       break;
-    
+
     case 1:
       _bc_name = "DirichletBC";
       break;
-        
+
     default:
       paramError("bc_type", "Invalid boundary condition.");
   }
-  
-  if (!_scalar_var)
+
+  if (_scalar_var)
     paramError("family", "This action does not support adding scalar variables");
 }
 
@@ -64,5 +64,5 @@ GeminioAddVariableAction::addConstantIC(const std::string & var_name, Real initi
   InputParameters params = _factory.getValidParams("ConstantIC");
   params.set<VariableName>("variable") = var_name;
   params.set<Real>("value") = initial;
-  _problem->addBoundaryCondition("ConstantIC", var_name + "_ic", params);
+  _problem->addInitialCondition("ConstantIC", var_name + "_ic", params);
 }

@@ -129,5 +129,4 @@ AddGVariable::act()
       addConstantIC(name() + "1i" + Moose::stringify(cur_num), 0.0);
     }
   }
-
 }

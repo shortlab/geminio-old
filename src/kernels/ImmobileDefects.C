@@ -77,89 +77,94 @@ ImmobileDefects::computeQpResidual()
   Real res_sum = 0.0;
   //printf("return immobile initial: %f %d\n",res_sum,_cur_size);
 
-  if (_cur_size>0){//v type
+  if (_cur_size>0)
+  {
+    //v type
     cur_size = _cur_size;
 
-    //vv reaction loss(-)
-    int tmp_size = std::min(v_size,_number_v-cur_size);
-    for (int i=0;i<tmp_size;i++){
-      res_sum += (*_val_v_vars[i])[_qp]*_u[_qp]*_gc._absorb(_v_size[i],cur_size);
+    // vv reaction loss(-)
+    int tmp_size = std::min(v_size, _number_v - cur_size);
+    for (int i = 0;i < tmp_size; ++i)
+    {
+      res_sum += (*_val_v_vars[i])[_qp] * _u[_qp] * _gc._absorb(_v_size[i], cur_size);
       //printf("reaction %d (-): %d %d\n",cur_size,_v_size[i],cur_size);
     }
 
-    //vi reaction loss(-)
-    for (int i=0;i<i_size;i++){
-      res_sum += (*_val_i_vars[i])[_qp]*_u[_qp]*_gc._absorb(-_i_size[i],cur_size);
+    // vi reaction loss(-)
+    for (int i = 0; i < i_size; ++i)
+      res_sum += (*_val_i_vars[i])[_qp] * _u[_qp] * _gc._absorb(-_i_size[i], cur_size);
+
+    // vv reaction gain(+)
+    int tmp = std::min((int)(cur_size/2), v_size);//_v_size.back()==v_size, avoid double count
+    for (int i = 0; i < tmp; ++i)
+    {
+      res_sum -= (*_val_v_vars[v_size+i])[_qp]*(*_val_v_vars[i])[_qp] * _gc._absorb(_v_size[i],cur_size-_v_size[i]);
+      //printf("reaction %d (+): %d %d\n",cur_size,_v_size[i],cur_size-_v_size[i]);
     }
 
-    //vv reaction gain(+)
-    int tmp = std::min((int)(cur_size/2),v_size);//_v_size.back()==v_size, avoid double count
-    for (int i=0;i<tmp;i++){
-        res_sum -= (*_val_v_vars[v_size+i])[_qp]*(*_val_v_vars[i])[_qp]*_gc._absorb(_v_size[i],cur_size-_v_size[i]);
-        //printf("reaction %d (+): %d %d\n",cur_size,_v_size[i],cur_size-_v_size[i]);
-    }
-
-    //vi reaction gain(+)
-    if (i_size!=0 && cur_size != _number_v){
+    // vi reaction gain(+)
+    if (i_size != 0 && cur_size != _number_v)
+    {
       tmp = _no_v_vars.size()-v_size-v_size;
-      for (int i=0;i<tmp;i++){
-      //  printf("return imm : %d %d %d\n",tmp,v_size,_val_v_vars.size());
-        res_sum -= (*_val_v_vars[v_size+v_size+i])[_qp]*(*_val_i_vars[i])[_qp]*_gc._absorb(-_i_size[i],cur_size+_i_size[i]);
+      for (int i = 0; i < tmp; ++i)
+      {
+        // printf("return imm : %d %d %d\n",tmp,v_size,_val_v_vars.size());
+        res_sum -= (*_val_v_vars[v_size+v_size+i])[_qp] * (*_val_i_vars[i])[_qp] * _gc._absorb(-_i_size[i], cur_size + _i_size[i]);
       }
     }
 
-    //v+1 emission gain(+)
-    if (cur_size<_number_v){
-      res_sum -= (*_val_v_vars[v_size+v_size])[_qp]*_gc._emit(cur_size+1);
+    // v+1 emission gain(+)
+    if (cur_size<_number_v)
+      res_sum -= (*_val_v_vars[v_size + v_size])[_qp] * _gc._emit(cur_size+1);
       //printf("emission %d (+): %d\n",cur_size,cur_size+1);
-    }
 
-    //v emission loss(-)
-    res_sum += _u[_qp]*_gc._emit(cur_size);
+    // v emission loss(-)
+    res_sum += _u[_qp] * _gc._emit(cur_size);
     //printf("emission %d (-): %d\n",cur_size,cur_size);
-
   }
-
-  else{
+  else
+  {
     cur_size = -_cur_size;
 
-    //ii reaction loss(-)
+    // ii reaction loss(-)
     int tmp_size = std::min(i_size,_number_i-cur_size);
-    for (int i=0;i<tmp_size;i++){
-      res_sum += (*_val_i_vars[i])[_qp]*_u[_qp]*_gc._absorb(-_i_size[i],-cur_size);
+    for (int i = 0; i < tmp_size; ++i)
+    {
+      res_sum += (*_val_i_vars[i])[_qp] * _u[_qp] * _gc._absorb(-_i_size[i],-cur_size);
       //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,-_i_size[i]);
     }
 
     //iv reaction loss(-)
     for (int i=0;i<v_size;i++){
-      res_sum += (*_val_v_vars[i])[_qp]*_u[_qp]*_gc._absorb(_v_size[i],-cur_size);
+      res_sum += (*_val_v_vars[i])[_qp] * _u[_qp] * _gc._absorb(_v_size[i],-cur_size);
       //printf("reaction %d (-): %d %d\n",_cur_size,_cur_size,_v_size[i]);
     }
 
     //ii reaction gain(+)
     int tmp = std::min((int)(cur_size/2),i_size);//_i_size.back()==i_size, avoid double count
-    for (int i=0;i<tmp;i++){
-        res_sum -= (*_val_i_vars[i_size+i])[_qp]*(*_val_i_vars[i])[_qp]*_gc._absorb(-_i_size[i],-cur_size+_i_size[i]);
+    for (int i = 0; i < tmp; ++i)
+    {
+        res_sum -= (*_val_i_vars[i_size+i])[_qp]*(*_val_i_vars[i])[_qp] * _gc._absorb(-_i_size[i],-cur_size+_i_size[i]);
         //printf("reaction %d (+): %d %d\n",_cur_size,_i_size[i]-cur_size,-_i_size[i]);
     }
 
     //iv reaction gain(+)
     if (v_size!=0 && cur_size != _number_i){
       tmp = _no_i_vars.size()-i_size-i_size;
-      for (int i=0;i<tmp;i++){
-        res_sum -= (*_val_i_vars[i_size+i_size+i])[_qp]*(*_val_v_vars[i])[_qp]*_gc._absorb(_v_size[i],-(cur_size+_v_size[i]));
+      for (int i = 0; i < tmp; ++i){
+        res_sum -= (*_val_i_vars[i_size+i_size+i])[_qp]*(*_val_v_vars[i])[_qp] * _gc._absorb(_v_size[i],-(cur_size+_v_size[i]));
         //printf("reaction %d (+): %d %d\n",_cur_size,-_v_size[i]-cur_size,_v_size[i]);
       }
     }
 
     //i+1 emission gain(+)
     if (cur_size<_number_i){
-      res_sum -= (*_val_i_vars[i_size+i_size])[_qp]*_gc._emit(-cur_size-1);
+      res_sum -= (*_val_i_vars[i_size+i_size])[_qp] * _gc._emit(-cur_size-1);
       //printf("emission %d (+): %d\n",_cur_size,-cur_size-1);
     }
 
     //i emission loss(-)
-    res_sum += _u[_qp]*_gc._emit(-cur_size);
+    res_sum += _u[_qp] * _gc._emit(-cur_size);
     //printf("emission %d (-): %d\n",_cur_size,-cur_size);
   }
 
@@ -174,7 +179,7 @@ ImmobileDefects::computeQpJacobian()
   int cur_size;
   Real jac_sum = 0.0;
 
-  if (_cur_size>0)
+  if (_cur_size > 0)
   {
     // v type
     cur_size = _cur_size;
@@ -182,11 +187,11 @@ ImmobileDefects::computeQpJacobian()
     // vv reaction loss(-)
     int tmp_size = std::min(v_size, _number_v - cur_size);
     for (int i=0;i<tmp_size;i++)
-      jac_sum += (*_val_v_vars[i])[_qp]*_gc._absorb(_v_size[i], cur_size);
+      jac_sum += (*_val_v_vars[i])[_qp] * _gc._absorb(_v_size[i], cur_size);
 
     // vi reaction loss(-)
     for (int i = 0; i < i_size; ++i)
-      jac_sum += (*_val_i_vars[i])[_qp]*_gc._absorb(-_i_size[i], cur_size);
+      jac_sum += (*_val_i_vars[i])[_qp] * _gc._absorb(-_i_size[i], cur_size);
 
     // v emission loss(-)
     jac_sum += _gc._emit(cur_size);
@@ -195,20 +200,20 @@ ImmobileDefects::computeQpJacobian()
   else
   {
     cur_size = -_cur_size;
-    //ii reaction loss(-)
+    // ii reaction loss(-)
     int tmp_size = std::min(i_size,_number_i-cur_size);
     for (int i=0;i<tmp_size;i++)
-      jac_sum += (*_val_i_vars[i])[_qp]*_gc._absorb(-_i_size[i], -cur_size);
+      jac_sum += (*_val_i_vars[i])[_qp] * _gc._absorb(-_i_size[i], -cur_size);
 
-    //iv reaction loss(-)
+    // iv reaction loss(-)
     for (int i = 0; i < v_size; ++i)
-      jac_sum += (*_val_v_vars[i])[_qp]*_gc._absorb(_v_size[i], -cur_size);
+      jac_sum += (*_val_v_vars[i])[_qp] * _gc._absorb(_v_size[i], -cur_size);
 
-    //i emission loss(-)
+    // i emission loss(-)
     jac_sum += _gc._emit(-cur_size);
   }
 
-  return jac_sum *_test[_i][_qp]*_phi[_j][_qp];
+  return jac_sum *_test[_i][_qp] * _phi[_j][_qp];
 }
 
 Real

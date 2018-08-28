@@ -37,7 +37,7 @@ InputParameters validParams<GroupConstant>()
 }
 
 GroupConstant::GroupConstant(const InputParameters & parameters) :
-    GeneralUserObject(parameters), 
+    GeneralUserObject(parameters),
     _GroupScheme(getParam<MooseEnum>("GroupScheme")),
     _sigma(getParam<Real>("sigma")),
     _boosting_factor(getParam<Real>("boosting_factor")),
@@ -57,8 +57,6 @@ GroupConstant::GroupConstant(const InputParameters & parameters) :
     _has_material(isParamValid("material")),
     _material(_has_material? &getUserObject<GMaterialConstants>("material") : nullptr),
     _atomic_vol(_material ? _material->getAtomicVol() : 0.0) // TODO: right now material MUST be provided!!!
-   // _emit_array(nullptr),
-   // _absorb_matrix(nullptr)
 {
 
   // test input correctness
@@ -83,15 +81,15 @@ GroupConstant::initialize()
   // int num_groups = GroupScheme_v.size();
   // for (int i = 0; i < num_groups; ++i)
   //   printf("group ID: %d; value: %d\n",i+1, GroupScheme_v[i]);
-  // 
+  //
   // num_groups = GroupScheme_i.size();
   // for (int i = 0; i < num_groups; ++i)
   //   printf("group ID: %d; value: %d\n",i+1,-GroupScheme_i[i]);
-  // 
+  //
   // //print group constants
   // for (SingleKey::const_iterator it = _emit_array.begin(); it != _emit_array.end(); ++it)
   //   printf("group: %d; emission: %10.8e\n",it->first,it->second);
-  // 
+  //
   // for (DoubleKey::const_iterator it = _absorb_matrix.begin(); it != _absorb_matrix.end(); ++it)
   //   printf("group1: %d; group2: %d; absorption: %10.8e\n",it->first.first,it->first.second,it->second);
 }
@@ -147,9 +145,10 @@ GroupConstant::setGroupScheme()
         // printf("add %d\n",-i);
       }
 
-      if (_single_i_group<_Ng_i){
-        int interval = (int)(_num_i-single_i_group)/(_Ng_i-single_i_group+1);
-        for(int i=single_i_group+interval;count<=_Ng_i;)
+      if (_single_i_group < _Ng_i)
+      {
+        int interval = (int)(_num_i - single_i_group) / (_Ng_i - single_i_group + 1);
+        for (int i = single_i_group + interval; count <= _Ng_i;)
         {
           GroupScheme_i.push_back(-i);
           count++;
@@ -271,12 +270,12 @@ GroupConstant::setGroupConstant()
   // absorption coefficients
   for (int i = 1; i <=_Ng_v; ++i)
   {
-    for (int j=1;j<=total_mobile_v;j++)
+    for (int j = 1; j <= total_mobile_v; ++j)
     {
       val = absorb_gc(GroupScheme_v[i-1], GroupScheme_v[i], GroupScheme_v[j-1], GroupScheme_v[j]);
       _absorb_matrix.insert(std::make_pair(std::make_pair(i, j), val));
     }
-    for (int j=1;j<=total_mobile_i;j++)
+    for (int j = 1; j <= total_mobile_i; ++j)
     {
       val = absorb_gc(GroupScheme_v[i-1], GroupScheme_v[i], GroupScheme_i[j-1], GroupScheme_i[j]);
       _absorb_matrix.insert(std::make_pair(std::make_pair(i, -j), val));
@@ -311,8 +310,9 @@ GroupConstant::setGroupConstant()
   //  }
 }
 
+// [cr_start,cr_end)
 Real
-GroupConstant::emit_gc(int cr_start, int cr_end) //[cr_start,cr_end)
+GroupConstant::emit_gc(int cr_start, int cr_end)
 {
   int pos_start = std::abs(cr_start);
   int pos_end = std::abs(cr_end);
@@ -322,7 +322,7 @@ GroupConstant::emit_gc(int cr_start, int cr_end) //[cr_start,cr_end)
   int multiply = (cr_start > 0 && cr_end > 0) || (cr_start < 0 && cr_end < 0);
   if (!(pos_start < pos_end) || multiply <= 0)
   {
-    //printf("what %d %d %d %d %d\n", cr_start,cr_end,pos_start,pos_end,multiply);
+    // printf("what %d %d %d %d %d\n", cr_start,cr_end,pos_start,pos_end,multiply);
     mooseError("Wrong interval terminal point in emit_gc function");
   }
 
@@ -388,7 +388,7 @@ GroupConstant::disl_gc(int cr_start, int cr_end) //[cr_start,cr_end)
 
 // [cr_start,cr_end)
 Real
-GroupConstant::diff_gc(int cr_start, int cr_end) 
+GroupConstant::diff_gc(int cr_start, int cr_end)
 {
   int pos_start = std::abs(cr_start);
   int pos_end = std::abs(cr_end);
@@ -423,44 +423,49 @@ GroupConstant::diff_gc(int cr_start, int cr_end)
 
 // [ot_start,ot_end),[cr_start,cr_end)
 Real
-GroupConstant::absorb_gc(int ot_start, int ot_end, int cr_start, int cr_end) 
+GroupConstant::absorb_gc(int ot_start, int ot_end, int cr_start, int cr_end)
 {
-  //[cr_start,cr_end) should be size 1 and mobile, i.e. cr_end=cr_start+1
+  // [cr_start,cr_end) should be size 1 and mobile, i.e. cr_end=cr_start+1
   int pos_ot_start = std::abs(ot_start);
   int pos_ot_end = std::abs(ot_end);
   int pos_cr_start = std::abs(cr_start);
   int pos_cr_end = std::abs(cr_end);
 
-  //printf("start end: %d %d %d %d\n",ot_start,ot_end,cr_start,cr_end);
+  // printf("start end: %d %d %d %d\n",ot_start,ot_end,cr_start,cr_end);
   if (pos_cr_end != pos_cr_start+1)
     mooseError("Wrong interval terminal point in absorb_gc mobile range");
 
-  if (!(pos_ot_start < pos_ot_end) || !(pos_cr_start < pos_cr_end) || (Real)ot_start * (Real)ot_end <= 0 || (Real)cr_start * (Real)cr_end<=0)
+  if (!(pos_ot_start < pos_ot_end) || !(pos_cr_start < pos_cr_end) || ot_start * ot_end <= 0 || cr_start * cr_end <= 0)
     mooseError("Wrong interval terminal point in absorb_gc function");
 
   Real sum = 0.0;
   Real counter = 0.0;
-  int tagi = 0,tagj = 0;//denote mobility: 0, imobile, 1, mobile
+  // denote mobility: 0, immobile, 1, mobile
+  int tagi = 0, tagj = 0;
   // int total_mobile_v = (int)_v_size.size();
   // int total_mobile_i = (int)_i_size.size();
 
   // if(ot_start >= _single_v_group && cr_start >= _single_v_group) return 0.0;
   if (ot_start > 0 && cr_start > 0)
   {
-    //vv reaction
-    for (int i = pos_ot_start; i < pos_ot_end; ++i){
+    // vv reaction
+    for (int i = pos_ot_start; i < pos_ot_end; ++i)
+    {
       // other group
       tagi = 0;
       if (std::find(_v_size.begin(), _v_size.end(), i) != _v_size.end())
         tagi = 1;
-      for (int j = pos_cr_start; j < pos_cr_end; ++j){
+      for (int j = pos_cr_start; j < pos_cr_end; ++j)
+      {
         // current group//redundant
         tagj = 0;
-        if (std::find(_v_size.begin(), _v_size.end(),j) != _v_size.end())
+        if (std::find(_v_size.begin(), _v_size.end(), j) != _v_size.end())
           tagj = 1;
-        sum += _material->absorb(i, j, MaterialParameters::Species::V, MaterialParameters::Species::V,_T,tagi,tagj);//absorption between i and j
+
+        // absorption between i and j
+        sum += _material->absorb(i, j, MaterialParameters::Species::V, MaterialParameters::Species::V, _T, tagi, tagj);
         counter += 1.0;
-        //printf("absorb v %d with v %d: %lf %lf\n",i,j,_material->absorb(i,j,MaterialParameters::Species::V,MaterialParameters::Species::V,_T,tagi,tagj));//,absorb(i,j,MaterialParameters::Species::V,MaterialParameters::Species::V,_T,tagi,tagj));
+        // printf("absorb v %d with v %d: %lf %lf\n",i,j,_material->absorb(i,j,MaterialParameters::Species::V,MaterialParameters::Species::V,_T,tagi,tagj));//,absorb(i,j,MaterialParameters::Species::V,MaterialParameters::Species::V,_T,tagi,tagj));
       }
     }
   }
@@ -480,7 +485,7 @@ GroupConstant::absorb_gc(int ot_start, int ot_end, int cr_start, int cr_end)
         if (std::find(_i_size.begin(),_i_size.end(),j) != _i_size.end())
           tagj = 1;
         // absorption between i and j
-        sum += _material->absorb(i, j, MaterialParameters::Species::V, MaterialParameters::Species::I, _T, tagi, tagj); 
+        sum += _material->absorb(i, j, MaterialParameters::Species::V, MaterialParameters::Species::I, _T, tagi, tagj);
         counter += 1.0;
         //printf("absorb v %d with i %d: %lf %lf\n",i,j,_material->absorb(i,j,MaterialParameters::Species::V,MaterialParameters::Species::I,_T,tagi,tagj),absorb(i,j,MaterialParameters::Species::V,MaterialParameters::Species::I,_T,tagi,tagj));
       }
@@ -502,7 +507,7 @@ GroupConstant::absorb_gc(int ot_start, int ot_end, int cr_start, int cr_end)
         if (std::find(_v_size.begin(), _v_size.end(), j) != _v_size.end())
           tagj = 1;
         // absorption between i and j
-        sum += _material->absorb(i,j,MaterialParameters::Species::I, MaterialParameters::Species::V, _T, tagi, tagj);
+        sum += _material->absorb(i, j, MaterialParameters::Species::I, MaterialParameters::Species::V, _T, tagi, tagj);
         counter += 1.0;
         //printf("absorb i %d with v %d: %lf\n",i,j,absorb(i,j,MaterialParameters::Species::I,MaterialParameters::Species::V,_T,tagi,tagj));
       }
@@ -515,13 +520,13 @@ GroupConstant::absorb_gc(int ot_start, int ot_end, int cr_start, int cr_end)
     {
       // other group
       tagi = 0;
-      if (std::find(_i_size.begin(),_i_size.end(),i) != _i_size.end())
+      if (std::find(_i_size.begin(), _i_size.end(), i) != _i_size.end())
         tagi = 1;
       for (int j = pos_cr_start; j < pos_cr_end; ++j)
       {
         // current group//redundant
         tagj = 0;
-        if (std::find(_i_size.begin(),_i_size.end(),j) != _i_size.end())
+        if (std::find(_i_size.begin(), _i_size.end(), j) != _i_size.end())
           tagj = 1;
         // absorption between i and j
         sum += _material->absorb(i, j, MaterialParameters::Species::I, MaterialParameters::Species::I, _T, tagi, tagj);
@@ -531,7 +536,7 @@ GroupConstant::absorb_gc(int ot_start, int ot_end, int cr_start, int cr_end)
     }
   }
   //printf("sum: %f counter: %d\n",sum,counter);
-  return sum/counter;
+  return sum / counter;
 }
 
 void
@@ -546,7 +551,7 @@ GroupConstant::execute()
 
 // [cr_start,cr_end)
 Real
-GroupConstant::_emit(int groupid) const 
+GroupConstant::_emit(int groupid) const
 {
   const auto it = _emit_array.find(groupid);
   if (it != _emit_array.end())
@@ -556,7 +561,7 @@ GroupConstant::_emit(int groupid) const
 
 // [cr_start,cr_end)
 Real
-GroupConstant::_disl(int groupid) const 
+GroupConstant::_disl(int groupid) const
 {
   const auto it = _disl_array.find(groupid);
   if (it != _disl_array.end())
@@ -582,15 +587,15 @@ GroupConstant::_absorb(int groupid1, int groupid2) const //[ot_start,ot_end),[cr
   {
     const auto it = _absorb_matrix.find(std::make_pair(groupid1, groupid2));
     if (it != _absorb_matrix.end())
-      return it->second;//_absorb_matrix[std::make_pair(groupid1,groupid2)];
+      return it->second; // _absorb_matrix[std::make_pair(groupid1,groupid2)];
   }
-    
+
   {
     const auto it = _absorb_matrix.find(std::make_pair(groupid2,groupid1));
     if (it != _absorb_matrix.end())
-      return it->second;//_absorb_matrix[std::make_pair(groupid2,groupid1)];
+      return it->second; // _absorb_matrix[std::make_pair(groupid2,groupid1)];
   }
-  
+
   mooseWarning("Absorption constant not found and return 0: ", groupid1, " vs ", groupid2, "\n");
   return 0.0;
 }

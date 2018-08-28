@@ -25,10 +25,9 @@ InputParameters validParams<VariableProduct>()
   return params;
 }
 
-VariableProduct::VariableProduct(const
-     InputParameters & parameters)
-     :Kernel(parameters),
-     _coeff(getParam<Real>("coeff"))
+VariableProduct::VariableProduct(const InputParameters & parameters)
+  : Kernel(parameters),
+    _coeff(getParam<Real>("coeff"))
 {
   int n = coupledComponents("coupled_vars");
   _vars.resize(n);

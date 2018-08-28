@@ -8,7 +8,7 @@ InputParameters validParams<GGroupingTest>()
 {
   InputParameters params = validParams<GMaterialConstants>();
   params.addClassDescription("Calculate specific material properties");
-  
+
   // iron atom volume um^3
   params.set<Real>("atomic_vol") = 1.205e-11;
 
@@ -55,13 +55,13 @@ Real GGroupingTest::energy(int s, MaterialParameters::Species species, MaterialP
   }
   else
     mooseError("Energy not defined");
-    
+
   return E;
 }
 */
 
 // test interstitial part
-Real 
+Real
 GGroupingTest::energy(int s, MaterialParameters::Species species, MaterialParameters::EType e_type) const
 {
   //unit:eV
@@ -109,25 +109,25 @@ GGroupingTest::energy(int s, MaterialParameters::Species species, MaterialParame
 
   if (e_type == MaterialParameters::EType::BINDING)
   {
-    if (species == MaterialParameters::Species::I) 
+    if (species == MaterialParameters::Species::I)
     {
       if (s == 1)
         return INF;
 
-      Real Ef = 1.77, gamma = 1.0 / 1.6022e-7; // ev/um^2
+      Real Ef = 1.77, gamma = 1.0 / 1.6022e-7; // eV/um^2
       // cluster effective radius
-      Real r = std::pow(s * _atomic_vol * 3.0 / (4.0 * libMesh::pi), 1.0/3.0); 
+      Real r = std::pow(s * _atomic_vol * 3.0 / (4.0 * libMesh::pi), 1.0/3.0);
       return Ef - 2 * gamma * _atomic_vol / r;
     }
     if (species == MaterialParameters::Species::V)
     {
       if (s == 1)
         return INF;
-        
-      Real Ef = 1.77, gamma = 1.0 / 1.6022e-7; // ev/um^2
+
+      Real Ef = 1.77, gamma = 1.0 / 1.6022e-7; // eV/um^2
       // cluster effective radius
-      Real r = std::pow(s  *_atomic_vol * 3.0 / (4.0 * libMesh::pi), 1.0/3.0); 
-      return Ef-2*gamma*_atomic_vol/r;
+      Real r = std::pow(s  *_atomic_vol * 3.0 / (4.0 * libMesh::pi), 1.0/3.0);
+      return Ef - 2 * gamma * _atomic_vol / r;
     }
   }
 
@@ -171,97 +171,90 @@ GGroupingTest::absorb(int S1, int S2, MaterialParameters::Species C1, MaterialPa
 Real
 GGroupingTest::absorbVV(int S1, int S2, int flag, Real T) const
 {
-  Real result = 0.0;
-  int S = (S1 > S2) ? S1 : S2;
+  int S = S1 > S2 ? S1 : S2;
   Real w = std::pow(48.0 * libMesh::pi * libMesh::pi / _atomic_vol / _atomic_vol * S, 1.0/3.0);
   switch (flag)
   {
     case 1:
     {
       Real D_s1 = D_prefactor(S1) * std::exp(-energy(S1, MaterialParameters::Species::V, MaterialParameters::EType::MIGRATION) / (_kB * T));
-      result = w * _atomic_vol * D_s1;
-      break;
+      return w * _atomic_vol * D_s1;
     }
     case 2:
     {
       Real D_s2 = D_prefactor(S2) * std::exp(-energy(S2, MaterialParameters::Species::V, MaterialParameters::EType::MIGRATION) / (_kB * T));
-      result = w * _atomic_vol * D_s2;
-      break;
+      return w * _atomic_vol * D_s2;
     }
     case 3:
     {
       Real D_s1 = D_prefactor(S1) * std::exp(-energy(S1, MaterialParameters::Species::V, MaterialParameters::EType::MIGRATION) / (_kB * T));
       Real D_s2 = D_prefactor(S2) * std::exp(-energy(S2, MaterialParameters::Species::V, MaterialParameters::EType::MIGRATION) / (_kB * T));
-      result = w*_atomic_vol*(D_s1+D_s2);//add _atomic_vol for unit concern,  P5/19 in ref
-      break;
+      // add _atomic_vol for unit concern,  P5/19 in ref
+      return w * _atomic_vol * (D_s1 + D_s2);
     }
   }
-  return result;
+
+  return 0.0;
 }
 
 //vi reaction; flag=0: both immobile; flag=1: first mobile; flag=2: second mobile; flag=3: both mobile
 Real
 GGroupingTest::absorbVI(int S1, int S2, int flag, Real T) const
 {
-  Real result = 0.0;
-  int S = (S1>S2)? S1: S2;
-  Real w = pow(48.0*libMesh::pi*libMesh::pi/_atomic_vol/_atomic_vol*S,1.0/3);
+  int S = S1 > S2 ? S1 : S2;
+  Real w = std::pow(48.0 * libMesh::pi * libMesh::pi / _atomic_vol / _atomic_vol * S, 1.0/3.0);
   switch (flag)
   {
     case 1:
     {
       Real D_s1 = D_prefactor(S1) * std::exp(-energy(S1, MaterialParameters::Species::V, MaterialParameters::EType::MIGRATION) / (_kB * T));
-      result = w * _atomic_vol * D_s1;
-      break;
+      return w * _atomic_vol * D_s1;
     }
     case 2:
     {
       Real D_s2 = D_prefactor(S2) * std::exp(-energy(S2, MaterialParameters::Species::I, MaterialParameters::EType::MIGRATION) / (_kB * T));
-      result = w * _atomic_vol * D_s2;
-      break;
+      return w * _atomic_vol * D_s2;
     }
     case 3:
     {
       Real D_s1 = D_prefactor(S1) * std::exp(-energy(S1, MaterialParameters::Species::V, MaterialParameters::EType::MIGRATION) / (_kB * T));
       Real D_s2 = D_prefactor(S2) * std::exp(-energy(S2, MaterialParameters::Species::I, MaterialParameters::EType::MIGRATION) / (_kB * T));
-      result = w*_atomic_vol*(D_s1+D_s2);//ref: Mean field rate theory and object kinetic monte carlo: a comparison of kinetic models
-      break;
+      // ref: Mean field rate theory and object kinetic Monte Carlo: a comparison of kinetic models
+      return w * _atomic_vol * (D_s1 + D_s2);
     }
   }
-  return result;
+
+  return 0.0;
 }
 
 //ii reaction; flag=0: both immobile; flag=1: first mobile; flag=2: second mobile; flag=3: both mobile
 Real
 GGroupingTest::absorbII(int S1, int S2, int flag, Real T) const
 {
-  Real result = 0.0;
-  int S = (S1>S2)? S1: S2;
-  Real w = pow(48.0*libMesh::pi*libMesh::pi/_atomic_vol/_atomic_vol*S,1.0/3);
+  int S = S1 > S2 ? S1 : S2;
+  Real w = std::pow(48.0 * libMesh::pi * libMesh::pi / _atomic_vol / _atomic_vol * S, 1.0/3.0);
   switch (flag)
   {
     case 1:
     {
-      Real D_s1 = D_prefactor(S1) * std::exp(-energy(S1, MaterialParameters::Species::I, MaterialParameters::EType::MIGRATION) / (_kB * T));
-      result = w * _atomic_vol * D_s1;
-      break;
+      const Real D_s1 = D_prefactor(S1) * std::exp(-energy(S1, MaterialParameters::Species::I, MaterialParameters::EType::MIGRATION) / (_kB * T));
+      return w * _atomic_vol * D_s1;
     }
     case 2:
     {
-      Real D_s2 = D_prefactor(S2) * std::exp(-energy(S2, MaterialParameters::Species::I, MaterialParameters::EType::MIGRATION) / (_kB * T));
-      result = w * _atomic_vol * D_s2;
-      break;
+      const Real D_s2 = D_prefactor(S2) * std::exp(-energy(S2, MaterialParameters::Species::I, MaterialParameters::EType::MIGRATION) / (_kB * T));
+      return w * _atomic_vol * D_s2;
     }
     case 3:
     {
-      Real D_s1 = D_prefactor(S1) * std::exp(-energy(S1, MaterialParameters::Species::I, MaterialParameters::EType::MIGRATION) / (_kB * T));
-      Real D_s2 = D_prefactor(S2) * std::exp(-energy(S2, MaterialParameters::Species::I, MaterialParameters::EType::MIGRATION) / (_kB * T));
+      const Real D_s1 = D_prefactor(S1) * std::exp(-energy(S1, MaterialParameters::Species::I, MaterialParameters::EType::MIGRATION) / (_kB * T));
+      const Real D_s2 = D_prefactor(S2) * std::exp(-energy(S2, MaterialParameters::Species::I, MaterialParameters::EType::MIGRATION) / (_kB * T));
       //ref: Mean field rate theory and object kinetic Monte Carlo: a comparison of kinetic models
-      result = w * _atomic_vol * (D_s1 + D_s2);
-      break;
+      return w * _atomic_vol * (D_s1 + D_s2);
     }
   }
-  return result;
+
+  return 0.0;
 }
 
 Real
@@ -277,19 +270,19 @@ GGroupingTest::emit(int S1, int S2, Real T, MaterialParameters::Species C1, Mate
   //for now only consider self species emission, S1 emits S2, S1==1
   Real emit_c = 0.0;
   if (S1 > S2 && S2==1)
-    emit_c = absorb(S1, S2, C1, C1, T, tag1, tag2)/(_atomic_vol) * 
+    emit_c = absorb(S1, S2, C1, C1, T, tag1, tag2)/(_atomic_vol) *
              std::exp(-energy(S1, C1, MaterialParameters::EType::BINDING) / (_kB * T));
 
   // unit:/s only emit point defect of the same species
   return emit_c;
 }
 
-Real 
-GGroupingTest::disl_ksq(int S1, MaterialParameters::Species C1, Real T, bool mobile) const 
+Real
+GGroupingTest::disl_ksq(int S1, MaterialParameters::Species C1, Real T, bool mobile) const
 {
   if (!mobile)
     return 0.0;
-    
+
   const Real bias = C1 == MaterialParameters::Species::V ? _v_bias : _i_bias;
   return diff(S1, C1, T) * _rho_d * bias;
 }

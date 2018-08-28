@@ -35,8 +35,8 @@ ClusterDensity::ClusterDensity(const InputParameters & parameters)
 
   for (unsigned int i = 0; i < ncoupled; ++i)
   {
-    _no_vars[i] = coupled("coupled_vars",i);
-    _val_vars[i] = &coupledValue("coupled_vars",i);
+    _no_vars[i] = coupled("coupled_vars", i);
+    _val_vars[i] = &coupledValue("coupled_vars", i);
   }
 }
 

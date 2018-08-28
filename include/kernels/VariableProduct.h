@@ -20,26 +20,25 @@
 //Forward Declarations
 class VariableProduct;
 
-
 template<>
 InputParameters validParams<VariableProduct>();
 
 class VariableProduct : public Kernel
 {
 public:
-  
-  VariableProduct(const 
-                            InputParameters & parameters);
-  
+  VariableProduct(const InputParameters & parameters);
+
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
 private:
-  Real  _coeff;
+  Real _coeff;
   std::vector<unsigned int> _vars;
+
   /// Coupled primary species concentrations.
   std::vector<const VariableValue *> _v_vals;
 };
-#endif 
+
+#endif // VARIABLEPRODUCT_H

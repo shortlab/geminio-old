@@ -33,6 +33,7 @@ InputParameters validParams<NodalConservationCheck>();
 /**
  * Sums a nodal value across all processors and multiplies the result
  * by a scale factor.
+ * Check to total number of defects in terms of point defect.
  */
 class NodalConservationCheck : public GeneralPostprocessor
 {
@@ -42,17 +43,17 @@ public:
   virtual void initialize() {}
   virtual void execute() {}
 
-  /**
-   * This will return the degrees of freedom in the system.
-   */
   virtual Real getValue();
 
 protected:
   MooseMesh & _mesh;
   std::string _var_prefix;
-  std::vector<int> _size_range;//cluster size range
+
+  /// cluster size range
+  std::vector<int> _size_range;
+
   Node * _node_ptr;
   const Real _scale_factor;
 };
 
-#endif
+#endif // NODALCONSERVATIONCHECK_H

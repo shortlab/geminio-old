@@ -23,6 +23,8 @@ GIron::GIron(const InputParameters & parameters)
 Real
 GIron::energy(int s, MaterialParameters::Species species, MaterialParameters::EType e_type) const
 {
+  const Real INF = 100.0;
+
   //unit:eV
   if (species == MaterialParameters::Species::V && e_type == MaterialParameters::EType::MIGRATION)
   {
@@ -42,7 +44,7 @@ GIron::energy(int s, MaterialParameters::Species species, MaterialParameters::ET
         return 0.48;
 
       default:
-        return 100.0; // "INF"
+        return INF;
     }
   }
   else if (species == MaterialParameters::Species::I && e_type == MaterialParameters::EType::MIGRATION)
@@ -59,7 +61,7 @@ GIron::energy(int s, MaterialParameters::Species species, MaterialParameters::ET
         return 0.43;
 
       default:
-        return 100.0; // "INF"
+        return INF;
     }
   }
   else if (species == MaterialParameters::Species::V && e_type == MaterialParameters::EType::BINDING)
@@ -67,7 +69,7 @@ GIron::energy(int s, MaterialParameters::Species species, MaterialParameters::ET
     switch (s)
     {
       case 1:
-        return 100.0; // "INF"
+        return INF;
 
       case 2:
         return 0.30;
@@ -91,7 +93,7 @@ GIron::energy(int s, MaterialParameters::Species species, MaterialParameters::ET
     switch (s)
     {
       case 1:
-        return 100.0; // "INF"
+        return INF;
 
       case 2:
         return 0.83;

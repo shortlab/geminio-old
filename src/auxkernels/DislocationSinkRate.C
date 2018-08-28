@@ -43,13 +43,16 @@ Real
 DislocationSinkRate::computeValue()
 {
   if (!_prop_name_DD.empty() && isParamValid("VariedDislocation"))
-     mooseError("Error: too many dislocation density provided" );
+    mooseError("Error: too many dislocation density provided" );
   if (_prop_name_DD.empty() && !(isParamValid("VariedDislocation")))
-     mooseError("Error: dislocation density needed" );
-  double rho_disl = (isParamValid("VariedDislocation")? _varied_dislocation[_qp] :  _dislocation_density[_qp]);
+    mooseError("Error: dislocation density needed" );
+
+  // TODO: outdated (use automatic constant material properties)
+  Real rho_disl = isParamValid("VariedDislocation") ? _varied_dislocation[_qp] : _dislocation_density[_qp];
+
   Real Half_Dislocation_Distance = std::pow((1 / (3.14159 * rho_disl)), 0.5);
 
-  Real K_dislocations = (2 * 3.14159 * rho_disl * _D_species[_qp])//_D_species[_qp]
+  Real K_dislocations = (2 * 3.14159 * rho_disl * _D_species[_qp]) //_D_species[_qp]
                          / std::log(Half_Dislocation_Distance / _dislocation_core_size);
 
   return K_dislocations;

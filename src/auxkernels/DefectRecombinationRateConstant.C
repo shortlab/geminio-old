@@ -35,7 +35,7 @@ Real
 DefectRecombinationRateConstant::computeValue()
 {
   // Real K_iv = (4 * 3.14159 * _lattice_parameter[_qp] * (_D_v[_qp] + _D_i[_qp])) / (_atomic_volume[_qp]);
-  Real K_not = (4 * 3.14159 *  (_atomic_volume[_qp]) * (_D_v[_qp] + _D_i[_qp])) /(_lattice_parameter[_qp]*_lattice_parameter[_qp]);
+  Real K_not = (4 * 3.14159 *  (_atomic_volume[_qp]) * (_D_v[_qp] + _D_i[_qp])) /(_lattice_parameter[_qp] * _lattice_parameter[_qp]);
   //printf("K_iv: %f; K_not: %f, ratio: %f\n",K_iv,K_not,K_iv/K_not);
   return K_not;
 }

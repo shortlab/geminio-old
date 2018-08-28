@@ -17,6 +17,8 @@
 #include "Factory.h"
 #include "Conversion.h"
 
+registerMooseAction("GeminioApp", AddGTimeDerivative, "add_kernel");
+
 template<>
 InputParameters validParams<AddGTimeDerivative>()
 {
@@ -40,13 +42,13 @@ AddGTimeDerivative::act()
   std::string var_name;
   for (unsigned int cur_num = 1; cur_num <= number_v; ++cur_num)
   {
-    var_name = name() +"0v"+ Moose::stringify(cur_num);
+    var_name = name() + "0v" + Moose::stringify(cur_num);
     InputParameters params = _factory.getValidParams("TimeDerivative");
     params.set<NonlinearVariableName>("variable") = var_name;
-    _problem->addKernel("TimeDerivative", "dt_0v_"+ var_name + Moose::stringify(cur_num), params);
+    _problem->addKernel("TimeDerivative", "dt_0v_" + var_name + Moose::stringify(cur_num), params);
     // printf("add TimeDerivative: %s\n",var_name_v.c_str());
 
-    var_name = name() +"1v"+ Moose::stringify(cur_num);
+    var_name = name() + "1v" + Moose::stringify(cur_num);
     InputParameters params1 = _factory.getValidParams("TimeDerivative");
     params1.set<NonlinearVariableName>("variable") = var_name;
     _problem->addKernel("TimeDerivative", "dt_1v_" + var_name + Moose::stringify(cur_num), params1);
@@ -55,16 +57,16 @@ AddGTimeDerivative::act()
 
   for (unsigned int cur_num = 1; cur_num <= number_i; cur_num++)
   {
-    var_name = name() +"0i"+ Moose::stringify(cur_num);
+    var_name = name() + "0i" + Moose::stringify(cur_num);
     InputParameters params = _factory.getValidParams("TimeDerivative");
     params.set<NonlinearVariableName>("variable") = var_name;
-    _problem->addKernel("TimeDerivative", "dt_0i_"+ var_name + Moose::stringify(cur_num), params);
+    _problem->addKernel("TimeDerivative", "dt_0i_" + var_name + Moose::stringify(cur_num), params);
     // printf("add TimeDerivative: %s\n",var_name_i.c_str());
 
-    var_name = name() +"1i"+ Moose::stringify(cur_num);
+    var_name = name() + "1i" + Moose::stringify(cur_num);
     InputParameters params1 = _factory.getValidParams("TimeDerivative");
     params1.set<NonlinearVariableName>("variable") = var_name;
-    _problem->addKernel("TimeDerivative", "dt_1i_"+ var_name + Moose::stringify(cur_num), params1);
+    _problem->addKernel("TimeDerivative", "dt_1i_" + var_name + Moose::stringify(cur_num), params1);
     // printf("add TimeDerivative: %s\n",var_name_i.c_str());
   }
 }
