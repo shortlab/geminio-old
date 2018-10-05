@@ -1,4 +1,4 @@
-# Geminio - A MOOSE-based cluster dynamics coede
+# Geminio - A MOOSE-based cluster dynamics code
 
 This snapshot uses the following software revisions to work. Please use these specific versions when trying to reproduce the results in this study:
 
